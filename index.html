@@ -801,10 +801,23 @@
               fechaInscripcion: new Date().toISOString()
             };
 
-            // Guardar en localStorage
+// Guardar en localStorage
             existing.unshift(newRecord);
             localStorage.setItem('udd_vocacional_registros', JSON.stringify(existing));
 
+            // Enviar automáticamente a la planilla de Google Sheets
+            const googleScriptUrl = 'https://script.google.com/macros/s/AKfycbzjbvSI-s6Rxwozp5S_rsmF8neajFF2umnXO_yxWXln1h9FkmtbnVeqoFkgfOEbEk7O/exec';
+            
+            try {
+                fetch(googleScriptUrl, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(newRecord)
+                });
+            } catch (e) {
+                console.warn("Error al conectar con Google Sheets:", e);
+            }
             currentVoucher.value = newRecord;
             showVoucherModal.value = true;
             isSubmitting.value = false;
