@@ -805,15 +805,46 @@
             existing.unshift(newRecord);
             localStorage.setItem('udd_vocacional_registros', JSON.stringify(existing));
 
-            // Enviar automáticamente a la planilla de Google Sheets
+            // --- FORMATEO PREVIO PARA GOOGLE SHEETS ---
+            // Convertir el objeto de cursos marcados a texto legible
+            let resumenCursos = "";
+            if (newRecord.cursos && typeof newRecord.cursos === 'object') {
+                let partes = [];
+                for (let cKey in newRecord.cursos) {
+                    let c = newRecord.cursos[cKey];
+                    if (c && c.selected) {
+                        partes.push(`${cKey} (${c.fecha || 'Sin fecha'} - ${c.alumnos || 0} est.)`);
+                    }
+                }
+                resumenCursos = partes.join(" | ");
+            } else {
+                resumenCursos = newRecord.cursos || "";
+            }
+
+            // Extraer únicamente el nombre del ejecutivo
+            let nombreEjecutivo = "";
+            if (newRecord.ejecutivo && typeof newRecord.ejecutivo === 'object') {
+                nombreEjecutivo = newRecord.ejecutivo.nombre || "";
+            } else {
+                nombreEjecutivo = newRecord.ejecutivo || "";
+            }
+
+            // Objeto formateado listo para enviar a la planilla
+            const payloadGoogle = {
+                ...newRecord,
+                cursos: resumenCursos,
+                ejecutivo: nombreEjecutivo
+            };
+
+            // Enviar a Google Sheets
             const googleScriptUrl = 'https://script.google.com/macros/s/AKfycbxBLcG5GWNT7B4q6ataIf0zOqHQ0RpHZBN1my8TEtkJIlYdD_j1Z5f9mUTBZy9zhZHzGg/exec';
-            
+
             try {
                 fetch(googleScriptUrl, {
                     method: 'POST',
                     mode: 'no-cors',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(newRecord)
+                    body: JSON.stringify(payloadGoogle)
                 });
             } catch (e) {
                 console.warn("Error al conectar con Google Sheets:", e);
