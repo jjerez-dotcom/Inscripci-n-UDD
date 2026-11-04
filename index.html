@@ -115,7 +115,7 @@
             </div>
           </div>
 
-          <!-- Pasos con los títulos acordados -->
+          <!-- Pasos -->
           <div class="grid grid-cols-3 text-center">
             <!-- Paso 1 -->
             <div class="cursor-pointer group" @click="goToStep(1)">
@@ -173,7 +173,7 @@
               <p class="text-xs text-slate-500 mt-1">Ingrese los datos de identificación de su colegio.</p>
             </div>
 
-            <!-- SELECCIÓN DE SEDE (Santiago o Concepción) -->
+            <!-- SELECCIÓN DE SEDE -->
             <div>
               <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-2">
                 Sede UDD <span class="text-red-500">*</span>
@@ -235,7 +235,7 @@
               </div>
             </div>
 
-            <!-- COMUNA (CAMPO DE TEXTO LIBRE) -->
+            <!-- COMUNA -->
             <div>
               <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">
                 Comuna <span class="text-red-500">*</span>
@@ -268,7 +268,7 @@
                 <i class="fa-solid fa-calendar-days text-udd-cyan mr-3"></i>
                 Paso 2: Cursos y Fechas
               </h3>
-              <p class="text-xs text-slate-500 mt-1">Seleccione los niveles a evaluar. La fecha del primer curso seleccionado se copiará a los demás, pero puede modificar cada una de forma independiente.</p>
+              <p class="text-xs text-slate-500 mt-1">Seleccione los niveles a evaluar. La fecha del primer curso seleccionado se copiará a los demás.</p>
             </div>
 
             <!-- Lista de Cursos -->
@@ -291,7 +291,7 @@
                     <span class="ml-3 font-extrabold text-slate-800 text-base">{{ cName }}</span>
                   </label>
 
-                  <!-- Inputs Fecha y Alumnos si está activo -->
+                  <!-- Inputs Fecha y Alumnos -->
                   <div v-if="cData.selected" class="grid grid-cols-1 sm:grid-cols-2 gap-3 flex-grow max-w-xl">
                     <div>
                       <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-600 mb-1">
@@ -329,7 +329,6 @@
               </div>
             </div>
 
-            <!-- Alerta si no se selecciona curso -->
             <div v-if="!hasSelectedCourses" class="p-3 bg-amber-50 border border-amber-200 rounded-xl text-amber-800 text-xs flex items-center">
               <i class="fa-solid fa-circle-info text-amber-600 mr-2 text-base"></i>
               Debe seleccionar al menos un curso para avanzar.
@@ -420,7 +419,7 @@
               </div>
             </div>
 
-            <!-- EJECUTIVO UDD A CARGO -->
+            <!-- EJECUTIVO UDD A CARGO (DESPLEGABLE DINÁMICO SANITIZADO) -->
             <div class="bg-udd-lightCyan/60 p-5 rounded-2xl border border-udd-cyan/20 space-y-4">
               <div>
                 <label class="block text-xs font-bold uppercase tracking-wider text-udd-navy mb-1">
@@ -432,27 +431,10 @@
                   required
                   class="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl text-sm font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-udd-cyan transition-all">
                   <option value="" disabled>Seleccione su Ejecutivo UDD</option>
-                  <option v-for="(ex, idx) in ejecutivosLista" :key="idx" :value="idx">
+                  <option v-for="(ex, idx) in ejecutivosFiltrados" :key="idx" :value="idx">
                     {{ ex.nombre }} — ({{ ex.email }})
                   </option>
-                  <option value="otro">Otro ejecutivo...</option>
                 </select>
-              </div>
-
-              <!-- Formulario desplegable para "Otro ejecutivo" -->
-              <div v-if="selectedExecutiveIndex === 'otro'" class="grid grid-cols-1 md:grid-cols-3 gap-3 pt-3 border-t border-udd-cyan/20">
-                <div>
-                  <label class="block text-[11px] font-bold text-slate-700 mb-1">Nombre Ejecutivo <span class="text-red-500">*</span></label>
-                  <input type="text" v-model="customExecutive.nombre" placeholder="Nombre completo" required class="w-full p-2.5 bg-white border rounded-lg text-xs">
-                </div>
-                <div>
-                  <label class="block text-[11px] font-bold text-slate-700 mb-1">Email Ejecutivo <span class="text-red-500">*</span></label>
-                  <input type="email" v-model="customExecutive.email" placeholder="correo@udd.cl" required class="w-full p-2.5 bg-white border rounded-lg text-xs">
-                </div>
-                <div>
-                  <label class="block text-[11px] font-bold text-slate-700 mb-1">Teléfono Ejecutivo <span class="text-red-500">*</span></label>
-                  <input type="tel" v-model="customExecutive.celular" placeholder="+56 9..." required class="w-full p-2.5 bg-white border rounded-lg text-xs">
-                </div>
               </div>
             </div>
 
@@ -486,7 +468,7 @@
       
       <div id="printable-voucher" class="bg-white rounded-3xl shadow-2xl border border-slate-100 max-w-xl w-full p-6 sm:p-8 relative my-8">
         
-        <!-- Header Comprobante con Logos -->
+        <!-- Header Comprobante -->
         <div class="flex justify-between items-center border-b border-slate-100 pb-4 mb-6">
           <div class="flex items-center space-x-3">
             <img src="logo_udd.png" alt="UDD" class="h-8 w-auto" onerror="this.style.display='none'">
@@ -501,7 +483,7 @@
           </div>
         </div>
 
-        <!-- Mensaje exacto de confirmación solicitado -->
+        <!-- Mensaje de confirmación -->
         <div class="bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-2xl p-4 mb-6 flex items-start space-x-3 no-print">
           <i class="fa-solid fa-circle-check text-emerald-600 text-xl mt-0.5"></i>
           <div class="text-xs font-medium leading-relaxed">
@@ -510,7 +492,7 @@
           </div>
         </div>
 
-        <!-- Resumen de Datos de la Inscripción -->
+        <!-- Resumen de Datos -->
         <div class="space-y-4 text-xs">
           
           <div class="bg-slate-50 p-4 rounded-xl space-y-2 border border-slate-100">
@@ -583,19 +565,20 @@
 
     createApp({
       setup() {
+        const googleScriptUrl = 'https://script.google.com/macros/s/AKfycbyZucS9vETuOEhB7EIKQb57Vbn8gAPhCljtwIlRdV87EZ7e1tSKVQFh0ppDiwGNprpB8A/exec';
+
         const step = ref(1);
         const isSubmitting = ref(false);
 
-        // Lista de Ejecutivos UDD
-        const ejecutivosLista = [
-          { nombre: 'Juan Lira', email: 'juan.lira@udd.cl', celular: '+56 9 9123 4567' },
-          { nombre: 'Valentina Rojas', email: 'vrojas@udd.cl', celular: '+56 9 8765 4321' },
-          { nombre: 'Gonzalo Morales', email: 'gmorales@udd.cl', celular: '+56 9 7112 3344' },
-          { nombre: 'Camila Silva', email: 'csilva@udd.cl', celular: '+56 9 5544 3322' }
-        ];
+        // Lista base por defecto (respaldo si falla la red)
+        const ejecutivosLista = ref([
+          { nombre: 'Valentina Rojas', email: 'vrojas@udd.cl', celular: '+56 9 8765 4321', sede: 'Santiago' },
+          { nombre: 'Gonzalo Morales', email: 'gmorales@udd.cl', celular: '+56 9 7112 3344', sede: 'Santiago' },
+          { nombre: 'Camila Silva', email: 'csilva@udd.cl', celular: '+56 9 5544 3322', sede: 'Concepción' },
+          { nombre: 'Matías Fuentes', email: 'mfuentes@udd.cl', celular: '+56 9 4433 2211', sede: 'Concepción' }
+        ]);
 
         const selectedExecutiveIndex = ref(0);
-        const customExecutive = ref({ nombre: '', email: '', celular: '' });
 
         // Estructura principal del Formulario
         const form = ref({
@@ -613,7 +596,7 @@
           cargoContacto: '',
           emailContacto: '',
           celularContacto: '',
-          ejecutivoUDD: { ...ejecutivosLista[0] }
+          ejecutivoUDD: null
         });
 
         const rbdError = ref('');
@@ -621,16 +604,35 @@
         const showVoucherModal = ref(false);
         const currentVoucher = ref({});
 
-        // Validación matemática en segundo plano Módulo 11 (Sin mostrar el nombre de la fórmula)
+        // Carga dinámica de ejecutivos desde la pestaña de Google Sheets
+        async function cargarEjecutivosPlanilla() {
+          try {
+            const res = await fetch(googleScriptUrl);
+            const json = await res.json();
+            if (json.status === 'success' && json.ejecutivos && json.ejecutivos.length > 0) {
+              ejecutivosLista.value = json.ejecutivos;
+              if (ejecutivosFiltrados.value.length > 0) {
+                selectedExecutiveIndex.value = 0;
+                form.value.ejecutivoUDD = { ...ejecutivosFiltrados.value[0] };
+              }
+            }
+          } catch (e) {
+            console.warn("Usando lista local de ejecutivos por defecto.");
+          }
+        }
+
+        const ejecutivosFiltrados = computed(() => {
+          return ejecutivosLista.value.filter(ex => !ex.sede || ex.sede === form.value.sede);
+        });
+
+        // Algoritmo Módulo 11 (RBD)
         function checkRBDValidity(rbdStr) {
           if (!rbdStr || !rbdStr.includes('-')) return false;
-          
           const parts = rbdStr.trim().split('-');
           if (parts.length !== 2) return false;
 
           const numStr = parts[0].replace(/\D/g, '');
           const dv = parts[1].toUpperCase();
-
           if (!numStr || dv.length !== 1) return false;
 
           let sum = 0;
@@ -643,7 +645,6 @@
 
           const mod = 11 - (sum % 11);
           let expectedDv = '';
-
           if (mod === 11) expectedDv = '0';
           else if (mod === 10) expectedDv = 'K';
           else expectedDv = mod.toString();
@@ -674,10 +675,8 @@
           }
         }
 
-        // Lógica de réplica automática de fechas en Paso 2
         function onDateInput(changedCourseName) {
           const selectedCoursesKeys = Object.keys(form.value.cursos).filter(k => form.value.cursos[k].selected);
-          
           if (selectedCoursesKeys.length > 0 && selectedCoursesKeys[0] === changedCourseName) {
             const primaryDate = form.value.cursos[changedCourseName].fecha;
             selectedCoursesKeys.forEach(k => {
@@ -699,14 +698,11 @@
         }
 
         function onExecutiveSelect() {
-          if (selectedExecutiveIndex.value === 'otro') {
-            form.value.ejecutivoUDD = customExecutive.value;
-          } else {
-            form.value.ejecutivoUDD = { ...ejecutivosLista[selectedExecutiveIndex.value] };
+          if (selectedExecutiveIndex.value !== '' && ejecutivosFiltrados.value[selectedExecutiveIndex.value]) {
+            form.value.ejecutivoUDD = { ...ejecutivosFiltrados.value[selectedExecutiveIndex.value] };
           }
         }
 
-        // Validaciones por paso
         const isStep1Valid = computed(() => {
           return form.value.sede && form.value.rbd && isRBDValid.value && form.value.nombreColegio && form.value.comuna.trim().length > 0;
         });
@@ -724,11 +720,12 @@
         });
 
         const isStep3Valid = computed(() => {
-          const hasContacto = form.value.nombreContacto && form.value.cargoContacto && form.value.emailContacto && form.value.celularContacto;
-          if (selectedExecutiveIndex.value === 'otro') {
-            return hasContacto && customExecutive.value.nombre && customExecutive.value.email && customExecutive.value.celular;
-          }
-          return hasContacto && selectedExecutiveIndex.value !== '';
+          return form.value.nombreContacto && 
+                 form.value.cargoContacto && 
+                 form.value.emailContacto && 
+                 form.value.celularContacto && 
+                 selectedExecutiveIndex.value !== '' && 
+                 selectedExecutiveIndex.value !== null;
         });
 
         const stepProgressWidth = computed(() => {
@@ -748,103 +745,101 @@
           if (current === 2 && isStep2Valid.value) step.value = 3;
         }
 
-// Proceso de Envío e Inscripción
-        function submitForm() {
+        async function submitForm() {
           if (!isStep3Valid.value) return;
           isSubmitting.value = true;
 
-          setTimeout(() => {
-            // Leer inscripciones previas en localStorage para la secuencia
-            const existing = JSON.parse(localStorage.getItem('udd_vocacional_registros') || '[]');
-            const year = new Date().getFullYear();
-            const sedeSigla = form.value.sede === 'Santiago' ? 'SCL' : 'CCP';
-            const seqNumber = String(existing.length + 1).padStart(3, '0');
-            
-            // Formato de código de seguimiento: 2026-SCL-8833-1-001
-            const trackingCode = `${year}-${sedeSigla}-${form.value.rbd}-${seqNumber}`;
+          const existing = JSON.parse(localStorage.getItem('udd_vocacional_registros') || '[]');
+          const year = new Date().getFullYear();
+          const sedeSigla = form.value.sede === 'Santiago' ? 'SCL' : 'CCP';
+          const seqNumber = String(existing.length + 1).padStart(3, '0');
+          const trackingCode = `${year}-${sedeSigla}-${form.value.rbd}-${seqNumber}`;
 
-            const cursosResumen = [];
-            let totalAlumnos = 0;
-            let resumenTextos = [];
+          const cursosResumen = [];
+          let totalAlumnos = 0;
+          let resumenTextos = [];
 
-            Object.keys(form.value.cursos).forEach(k => {
-              if (form.value.cursos[k].selected) {
-                const c = form.value.cursos[k];
-                cursosResumen.push({
-                  nombre: k,
-                  fecha: c.fecha,
-                  alumnos: Number(c.alumnos)
-                });
-                totalAlumnos += Number(c.alumnos);
-                resumenTextos.push(`${k} (${c.fecha} - ${c.alumnos} est.)`);
-              }
-            });
+          let detalleCursosSeparados = {
+            'II° Medio': '-',
+            'III° Medio': '-',
+            'IV° Medio': '-',
+            'Egresados': '-'
+          };
 
-            const currentExec = selectedExecutiveIndex.value === 'otro' 
-              ? { ...customExecutive.value } 
-              : { ...ejecutivosLista[selectedExecutiveIndex.value] };
-
-            // 1. OBJETO PARA LA PANTALLA (mantiene los objetos para el modal visual)
-            const newRecord = {
-              codigoTracking: trackingCode,
-              sede: form.value.sede,
-              rbd: form.value.rbd,
-              nombreColegio: form.value.nombreColegio,
-              comuna: form.value.comuna,
-              cursosResumen,
-              cursosResumenTexto: resumenTextos.join(' | '),
-              totalAlumnos,
-              nombreContacto: form.value.nombreContacto,
-              cargoContacto: form.value.cargoContacto,
-              emailContacto: form.value.emailContacto,
-              celularContacto: form.value.celularContacto,
-              ejecutivoUDD: currentExec,
-              fechaInscripcion: new Date().toISOString()
-            };
-
-            // Guardar respaldo local
-            existing.unshift(newRecord);
-            localStorage.setItem('udd_vocacional_registros', JSON.stringify(existing));
-
-            // 2. PAYLOAD PLANO PARA GOOGLE SHEETS (convierte objetos a texto limpio)
-            const payloadGoogle = {
-              codigoRegistro: trackingCode,
-              fechaRegistro: new Date().toISOString(),
-              sede: form.value.sede,
-              rbd: form.value.rbd,
-              nombreColegio: form.value.nombreColegio,
-              comuna: form.value.comuna,
-              cursos: resumenTextos.join(' | '),
-              totalAlumnos: totalAlumnos,
-              contactoNombre: form.value.nombreContacto,
-              contactoCargo: form.value.cargoContacto,
-              contactoEmail: form.value.emailContacto,
-              contactoCelular: form.value.celularContacto,
-              ejecutivo: currentExec ? (currentExec.nombre || '') : ''
-            };
-
-            // Envío en segundo plano a Google Apps Script
-            const googleScriptUrl = 'https://script.google.com/macros/s/AKfycbxBLcG5GWNT7B4q6ataIf0zOqHQ0RpHZBN1my8TEtkJIlYdD_j1Z5f9mUTBZy9zhZHzGg/exec';
-
-            try {
-              fetch(googleScriptUrl, {
-                method: 'POST',
-                mode: 'no-cors',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payloadGoogle)
+          Object.keys(form.value.cursos).forEach(k => {
+            if (form.value.cursos[k].selected) {
+              const c = form.value.cursos[k];
+              cursosResumen.push({
+                nombre: k,
+                fecha: c.fecha,
+                alumnos: Number(c.alumnos)
               });
-            } catch (e) {
-              console.warn("Error conectando con Google Sheets:", e);
+              totalAlumnos += Number(c.alumnos);
+              resumenTextos.push(`${k} (${c.fecha} - ${c.alumnos} est.)`);
+              detalleCursosSeparados[k] = `${c.fecha} (${c.alumnos} est.)`;
             }
+          });
 
-            // Mostrar el comprobante oficial en pantalla
-            currentVoucher.value = newRecord;
-            showVoucherModal.value = true;
-            isSubmitting.value = false;
+          const currentExec = ejecutivosFiltrados.value[selectedExecutiveIndex.value] || {};
 
-            // Resetear Formulario para una nueva sesión
-            resetForm();
-          }, 500);
+          // 1. Objeto para el Modal Web
+          const newRecord = {
+            codigoTracking: trackingCode,
+            sede: form.value.sede,
+            rbd: form.value.rbd,
+            nombreColegio: form.value.nombreColegio,
+            comuna: form.value.comuna,
+            cursosResumen,
+            cursosResumenTexto: resumenTextos.join(' | '),
+            totalAlumnos,
+            nombreContacto: form.value.nombreContacto,
+            cargoContacto: form.value.cargoContacto,
+            emailContacto: form.value.emailContacto,
+            celularContacto: form.value.celularContacto,
+            ejecutivoUDD: currentExec,
+            fechaInscripcion: new Date().toISOString()
+          };
+
+          existing.unshift(newRecord);
+          localStorage.setItem('udd_vocacional_registros', JSON.stringify(existing));
+
+          // 2. Payload para Google Apps Script (Columnas independientes + Correo del Ejecutivo)
+          const payloadGoogle = {
+            codigoRegistro: trackingCode,
+            fechaRegistro: new Date().toISOString(),
+            sede: form.value.sede,
+            rbd: form.value.rbd,
+            nombreColegio: form.value.nombreColegio,
+            comuna: form.value.comuna,
+            curso_II_Medio: detalleCursosSeparados['II° Medio'],
+            curso_III_Medio: detalleCursosSeparados['III° Medio'],
+            curso_IV_Medio: detalleCursosSeparados['IV° Medio'],
+            curso_Egresados: detalleCursosSeparados['Egresados'],
+            totalAlumnos: totalAlumnos,
+            contactoNombre: form.value.nombreContacto,
+            contactoCargo: form.value.cargoContacto,
+            contactoEmail: form.value.emailContacto,
+            contactoCelular: form.value.celularContacto,
+            ejecutivo: currentExec.nombre || '',
+            ejecutivoEmail: currentExec.email || ''
+          };
+
+          try {
+            await fetch(googleScriptUrl, {
+              method: 'POST',
+              mode: 'no-cors',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(payloadGoogle)
+            });
+          } catch (e) {
+            console.warn("Error enviando a Google Sheets:", e);
+          }
+
+          currentVoucher.value = newRecord;
+          showVoucherModal.value = true;
+          isSubmitting.value = false;
+
+          resetForm();
         }
 
         function resetForm() {
@@ -867,10 +862,9 @@
             cargoContacto: '',
             emailContacto: '',
             celularContacto: '',
-            ejecutivoUDD: { ...ejecutivosLista[0] }
+            ejecutivoUDD: ejecutivosFiltrados.value[0] || null
           };
           selectedExecutiveIndex.value = 0;
-          customExecutive.value = { nombre: '', email: '', celular: '' };
           rbdError.value = '';
           isRBDValid.value = false;
           step.value = 1;
@@ -906,6 +900,8 @@
           form.value.cursos['III° Medio'].fecha = defStr;
           form.value.cursos['IV° Medio'].fecha = defStr;
           form.value.cursos['Egresados'].fecha = defStr;
+
+          cargarEjecutivosPlanilla();
         });
 
         return {
@@ -916,9 +912,8 @@
           validateRBDInput,
           onDateInput,
           onCourseToggle,
-          ejecutivosLista,
+          ejecutivosFiltrados,
           selectedExecutiveIndex,
-          customExecutive,
           onExecutiveSelect,
           isStep1Valid,
           hasSelectedCourses,
