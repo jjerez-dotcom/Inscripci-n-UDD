@@ -801,38 +801,48 @@
               fechaInscripcion: new Date().toISOString()
             };
 
-// Guardar en localStorage
+// Guardar respaldo en localStorage
             existing.unshift(newRecord);
             localStorage.setItem('udd_vocacional_registros', JSON.stringify(existing));
 
-            // --- FORMATEO PREVIO PARA GOOGLE SHEETS ---
-            // Convertir el objeto de cursos marcados a texto legible
+            // --- CONVERSIÓN A TEXTO PLANO ---
+            // 1. Procesar Cursos y Fechas
             let resumenCursos = "";
-            if (newRecord.cursos && typeof newRecord.cursos === 'object') {
+            if (this.form.cursos && typeof this.form.cursos === 'object') {
                 let partes = [];
-                for (let cKey in newRecord.cursos) {
-                    let c = newRecord.cursos[cKey];
-                    if (c && c.selected) {
-                        partes.push(`${cKey} (${c.fecha || 'Sin fecha'} - ${c.alumnos || 0} est.)`);
+                for (let key in this.form.cursos) {
+                    let c = this.form.cursos[key];
+                    if (c && (c.selected || c.activo || (c.alumnos && Number(c.alumnos) > 0))) {
+                        partes.push(`${key} (${c.fecha || 'Sin fecha'} - ${c.alumnos || 0} est.)`);
                     }
                 }
                 resumenCursos = partes.join(" | ");
             } else {
-                resumenCursos = newRecord.cursos || "";
+                resumenCursos = String(newRecord.cursos || "");
             }
 
-            // Extraer únicamente el nombre del ejecutivo
+            // 2. Extraer Nombre del Ejecutivo UDD
             let nombreEjecutivo = "";
-            if (newRecord.ejecutivo && typeof newRecord.ejecutivo === 'object') {
-                nombreEjecutivo = newRecord.ejecutivo.nombre || "";
+            if (this.form.ejecutivo && typeof this.form.ejecutivo === 'object') {
+                nombreEjecutivo = this.form.ejecutivo.nombre || "";
             } else {
-                nombreEjecutivo = newRecord.ejecutivo || "";
+                nombreEjecutivo = String(this.form.ejecutivo || "");
             }
 
-            // Objeto formateado listo para enviar a la planilla
+            // Objeto plano (sin objetos anidados)
             const payloadGoogle = {
-                ...newRecord,
+                codigoRegistro: this.codigoGenerado || newRecord.codigoRegistro || "",
+                fechaRegistro: new Date().toISOString(),
+                sede: this.form.sede || "",
+                rbd: this.form.rbd || "",
+                nombreColegio: this.form.nombreColegio || "",
+                comuna: this.form.comuna || "",
                 cursos: resumenCursos,
+                totalAlumnos: this.getResumenCursos ? this.getResumenCursos().reduce((sum, item) => sum + Number(item.alumnos), 0) : (newRecord.totalAlumnos || 0),
+                contactoNombre: this.form.contactoNombre || "",
+                contactoCargo: this.form.contactoCargo || "",
+                contactoEmail: this.form.contactoEmail || "",
+                contactoCelular: this.form.contactoCelular || "",
                 ejecutivo: nombreEjecutivo
             };
 
@@ -847,7 +857,8 @@
                     body: JSON.stringify(payloadGoogle)
                 });
             } catch (e) {
-                console.warn("Error al conectar con Google Sheets:", e);
+                console.warn("Error enviando a Google Sheets:", e);
+            }
             }
             currentVoucher.value = newRecord;
             showVoucherModal.value = true;
