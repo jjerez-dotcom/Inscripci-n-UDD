@@ -1,0 +1,910 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Inscripción Test Vocacional - UDD y Fundación Promueva</title>
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Vue 3 -->
+  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+  <!-- FontAwesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Google Fonts Inter -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            udd: {
+              navy: '#002B49',
+              dark: '#061325',
+              blue: '#005A9C',
+              cyan: '#00A3E0',
+              lightCyan: '#F0F9FF',
+              gray: '#F8FAFC',
+              slate: '#334155'
+            }
+          },
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    [v-cloak] { display: none; }
+    
+    /* Quitar flechas de ajuste en inputs numéricos */
+    input[type=number]::-webkit-inner-spin-button, 
+    input[type=number]::-webkit-outer-spin-button { 
+      -webkit-appearance: none; 
+      margin: 0; 
+    }
+    input[type=number] {
+      -moz-appearance: textfield;
+    }
+
+    @media print {
+      body * {
+        visibility: hidden;
+      }
+      #printable-voucher, #printable-voucher * {
+        visibility: visible;
+      }
+      #printable-voucher {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+      }
+      .no-print {
+        display: none !important;
+      }
+    }
+  </style>
+</head>
+<body class="bg-slate-100 font-sans text-slate-800 antialiased min-h-screen flex flex-col selection:bg-udd-cyan selection:text-white">
+
+  <div id="app" v-cloak class="flex-grow flex flex-col">
+    
+    <!-- CABECERA PRINCIPAL CON LOGOS OFICIALES -->
+    <header class="bg-white text-slate-900 shadow-md border-b-4 border-udd-cyan sticky top-0 z-30 no-print">
+      <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex items-center justify-between py-4 h-24">
+          
+          <!-- LOGO UDD -->
+          <div class="flex items-center">
+            <img 
+              src="logo_udd.png" 
+              alt="Universidad del Desarrollo" 
+              class="h-12 sm:h-16 w-auto object-contain"
+              onerror="this.onerror=null; this.src='https://placehold.co/220x70/002B49/ffffff?text=UDD';"
+            />
+          </div>
+
+          <!-- LOGO FUNDACIÓN PROMUEVA -->
+          <div class="flex items-center">
+            <img 
+              src="logo_promueva.png" 
+              alt="Fundación Promueva" 
+              class="h-12 sm:h-16 w-auto object-contain"
+              onerror="this.onerror=null; this.src='https://placehold.co/220x70/ffffff/334155?text=Fundación+Promueva';"
+            />
+          </div>
+
+        </div>
+      </div>
+    </header>
+
+    <!-- CONTENIDO PRINCIPAL -->
+    <main class="flex-grow py-8 px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto w-full">
+      
+      <!-- Stepper / Indicador de Pasos -->
+      <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200/80 mb-8">
+        <div class="relative">
+          <!-- Barra de Progreso -->
+          <div class="overflow-hidden h-2 mb-6 text-xs flex rounded-full bg-slate-100">
+            <div 
+              class="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-udd-cyan transition-all duration-300"
+              :style="{ width: stepProgressWidth }">
+            </div>
+          </div>
+
+          <!-- Pasos con los títulos acordados -->
+          <div class="grid grid-cols-3 text-center">
+            <!-- Paso 1 -->
+            <div class="cursor-pointer group" @click="goToStep(1)">
+              <div 
+                :class="[
+                  step >= 1 ? 'bg-udd-navy text-white ring-4 ring-udd-lightCyan' : 'bg-slate-100 text-slate-400',
+                  'w-10 h-10 rounded-full flex items-center justify-center font-bold mx-auto mb-2 transition-all'
+                ]">
+                <i v-if="step > 1" class="fa-solid fa-check text-udd-cyan"></i>
+                <span v-else>1</span>
+              </div>
+              <span :class="step === 1 ? 'text-udd-navy font-bold' : 'text-slate-500'" class="text-xs sm:text-sm block">1. Inscripción Colegio</span>
+            </div>
+
+            <!-- Paso 2 -->
+            <div class="cursor-pointer group" @click="goToStep(2)">
+              <div 
+                :class="[
+                  step >= 2 ? 'bg-udd-navy text-white ring-4 ring-udd-lightCyan' : 'bg-slate-100 text-slate-400',
+                  'w-10 h-10 rounded-full flex items-center justify-center font-bold mx-auto mb-2 transition-all'
+                ]">
+                <i v-if="step > 2" class="fa-solid fa-check text-udd-cyan"></i>
+                <span v-else>2</span>
+              </div>
+              <span :class="step === 2 ? 'text-udd-navy font-bold' : 'text-slate-500'" class="text-xs sm:text-sm block">2. Cursos y Fechas</span>
+            </div>
+
+            <!-- Paso 3 -->
+            <div class="cursor-pointer group" @click="goToStep(3)">
+              <div 
+                :class="[
+                  step >= 3 ? 'bg-udd-navy text-white ring-4 ring-udd-lightCyan' : 'bg-slate-100 text-slate-400',
+                  'w-10 h-10 rounded-full flex items-center justify-center font-bold mx-auto mb-2 transition-all'
+                ]">
+                <span>3</span>
+              </div>
+              <span :class="step === 3 ? 'text-udd-navy font-bold' : 'text-slate-500'" class="text-xs sm:text-sm block">3. Contacto</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Form Card principal -->
+      <div class="bg-white rounded-2xl shadow-xl border border-slate-200/80 p-6 sm:p-8">
+        
+        <form @submit.prevent="submitForm">
+
+          <!-- PASO 1: INSCRIPCIÓN COLEGIO -->
+          <div v-show="step === 1" class="space-y-6">
+            <div class="border-b border-slate-100 pb-4">
+              <h3 class="text-xl font-bold text-udd-navy flex items-center">
+                <i class="fa-solid fa-school text-udd-cyan mr-3"></i>
+                Paso 1: Inscripción Colegio
+              </h3>
+              <p class="text-xs text-slate-500 mt-1">Ingrese los datos de identificación de su colegio.</p>
+            </div>
+
+            <!-- SELECCIÓN DE SEDE (Santiago o Concepción) -->
+            <div>
+              <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-2">
+                Sede UDD <span class="text-red-500">*</span>
+              </label>
+              <div class="grid grid-cols-2 gap-4">
+                <label 
+                  :class="form.sede === 'Santiago' ? 'border-udd-cyan bg-udd-lightCyan text-udd-navy ring-2 ring-udd-cyan/30' : 'border-slate-200 hover:border-slate-300 text-slate-600'"
+                  class="flex items-center p-4 border rounded-xl cursor-pointer transition-all">
+                  <input type="radio" v-model="form.sede" value="Santiago" class="text-udd-cyan focus:ring-udd-cyan h-4 w-4">
+                  <span class="ml-3 font-bold text-base">Santiago</span>
+                </label>
+
+                <label 
+                  :class="form.sede === 'Concepción' ? 'border-udd-cyan bg-udd-lightCyan text-udd-navy ring-2 ring-udd-cyan/30' : 'border-slate-200 hover:border-slate-300 text-slate-600'"
+                  class="flex items-center p-4 border rounded-xl cursor-pointer transition-all">
+                  <input type="radio" v-model="form.sede" value="Concepción" class="text-udd-cyan focus:ring-udd-cyan h-4 w-4">
+                  <span class="ml-3 font-bold text-base">Concepción</span>
+                </label>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <!-- RBD DEL COLEGIO -->
+              <div>
+                <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">
+                  RBD Colegio (con guion) <span class="text-red-500">*</span>
+                </label>
+                <input 
+                  type="text" 
+                  v-model="form.rbd" 
+                  @input="validateRBDInput"
+                  placeholder="Ej: 8833-1" 
+                  required
+                  :class="[
+                    rbdError ? 'border-red-400 bg-red-50 focus:ring-red-400' : 'border-slate-200 focus:ring-udd-cyan',
+                    'w-full px-4 py-3 bg-slate-50 border rounded-xl text-sm focus:bg-white focus:outline-none focus:ring-2 font-mono font-bold transition-all'
+                  ]">
+                
+                <span v-if="rbdError" class="text-xs text-red-600 font-semibold mt-1 block">
+                  <i class="fa-solid fa-triangle-exclamation mr-1"></i> {{ rbdError }}
+                </span>
+                <span v-else-if="form.rbd && isRBDValid" class="text-xs text-emerald-600 font-semibold mt-1 block">
+                  <i class="fa-solid fa-circle-check mr-1"></i> RBD Válido
+                </span>
+                <span v-else class="text-[11px] text-slate-400 mt-1 block">Formato: número-dígito (ej. 8833-1)</span>
+              </div>
+
+              <!-- NOMBRE COLEGIO -->
+              <div class="md:col-span-2">
+                <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">
+                  Nombre del Colegio <span class="text-red-500">*</span>
+                </label>
+                <input 
+                  type="text" 
+                  v-model="form.nombreColegio" 
+                  required
+                  placeholder="Ingrese el nombre completo del colegio" 
+                  class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-udd-cyan transition-all">
+              </div>
+            </div>
+
+            <!-- COMUNA (CAMPO DE TEXTO LIBRE) -->
+            <div>
+              <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">
+                Comuna <span class="text-red-500">*</span>
+              </label>
+              <input 
+                type="text" 
+                v-model="form.comuna" 
+                required
+                placeholder="Escriba la comuna correspondiente" 
+                class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-udd-cyan transition-all">
+            </div>
+
+            <!-- Botón Paso 1 -->
+            <div class="flex justify-end pt-4 border-t border-slate-100">
+              <button 
+                type="button" 
+                @click="nextStep(1)"
+                :disabled="!isStep1Valid"
+                class="bg-udd-navy hover:bg-udd-blue disabled:opacity-50 text-white font-bold px-6 py-3 rounded-xl transition-all flex items-center shadow-md">
+                Siguiente: Cursos y Fechas
+                <i class="fa-solid fa-arrow-right ml-2"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- PASO 2: CURSOS Y FECHAS -->
+          <div v-show="step === 2" class="space-y-6">
+            <div class="border-b border-slate-100 pb-4">
+              <h3 class="text-xl font-bold text-udd-navy flex items-center">
+                <i class="fa-solid fa-calendar-days text-udd-cyan mr-3"></i>
+                Paso 2: Cursos y Fechas
+              </h3>
+              <p class="text-xs text-slate-500 mt-1">Seleccione los niveles a evaluar. La fecha del primer curso seleccionado se copiará a los demás, pero puede modificar cada una de forma independiente.</p>
+            </div>
+
+            <!-- Lista de Cursos -->
+            <div class="space-y-4">
+              <div 
+                v-for="(cData, cName) in form.cursos" 
+                :key="cName"
+                :class="cData.selected ? 'border-udd-cyan bg-udd-lightCyan/40 ring-1 ring-udd-cyan/30' : 'border-slate-200 bg-slate-50'"
+                class="p-4 rounded-xl border transition-all">
+                
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                  
+                  <!-- Checkbox Selección -->
+                  <label class="flex items-center cursor-pointer min-w-[160px]">
+                    <input 
+                      type="checkbox" 
+                      v-model="cData.selected" 
+                      @change="onCourseToggle(cName)"
+                      class="h-5 w-5 rounded border-slate-300 text-udd-cyan focus:ring-udd-cyan">
+                    <span class="ml-3 font-extrabold text-slate-800 text-base">{{ cName }}</span>
+                  </label>
+
+                  <!-- Inputs Fecha y Alumnos si está activo -->
+                  <div v-if="cData.selected" class="grid grid-cols-1 sm:grid-cols-2 gap-3 flex-grow max-w-xl">
+                    <div>
+                      <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-600 mb-1">
+                        Fecha aproximada de aplicación
+                      </label>
+                      <input 
+                        type="date" 
+                        v-model="cData.fecha"
+                        @input="onDateInput(cName)"
+                        :min="minDate"
+                        required
+                        class="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-udd-cyan">
+                    </div>
+
+                    <div>
+                      <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-600 mb-1">
+                        Estudiantes aproximados
+                      </label>
+                      <input 
+                        type="number" 
+                        v-model="cData.alumnos" 
+                        min="1" 
+                        max="1000"
+                        required
+                        placeholder="Cantidad est."
+                        class="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-xs font-mono font-bold focus:outline-none focus:ring-2 focus:ring-udd-cyan">
+                    </div>
+                  </div>
+
+                  <div v-else class="text-xs text-slate-400 italic">
+                    Marque la casilla para habilitar este nivel.
+                  </div>
+
+                </div>
+              </div>
+            </div>
+
+            <!-- Alerta si no se selecciona curso -->
+            <div v-if="!hasSelectedCourses" class="p-3 bg-amber-50 border border-amber-200 rounded-xl text-amber-800 text-xs flex items-center">
+              <i class="fa-solid fa-circle-info text-amber-600 mr-2 text-base"></i>
+              Debe seleccionar al menos un curso para avanzar.
+            </div>
+
+            <!-- Botones Paso 2 -->
+            <div class="flex justify-between pt-4 border-t border-slate-100">
+              <button 
+                type="button" 
+                @click="step = 1"
+                class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold px-5 py-3 rounded-xl transition-all flex items-center">
+                <i class="fa-solid fa-arrow-left mr-2"></i>
+                Anterior
+              </button>
+
+              <button 
+                type="button" 
+                @click="nextStep(2)"
+                :disabled="!isStep2Valid"
+                class="bg-udd-navy hover:bg-udd-blue disabled:opacity-50 text-white font-bold px-6 py-3 rounded-xl transition-all flex items-center shadow-md">
+                Siguiente: Contacto
+                <i class="fa-solid fa-arrow-right ml-2"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- PASO 3: CONTACTO -->
+          <div v-show="step === 3" class="space-y-6">
+            <div class="border-b border-slate-100 pb-4">
+              <h3 class="text-xl font-bold text-udd-navy flex items-center">
+                <i class="fa-solid fa-id-card text-udd-cyan mr-3"></i>
+                Paso 3: Contacto
+              </h3>
+              <p class="text-xs text-slate-500 mt-1">Ingrese los datos de la persona de contacto en el establecimiento y seleccione su Ejecutivo UDD.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <!-- NOMBRE CONTACTO -->
+              <div>
+                <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">
+                  Nombre del Contacto <span class="text-red-500">*</span>
+                </label>
+                <input 
+                  type="text" 
+                  v-model="form.nombreContacto" 
+                  required
+                  placeholder="Ej: María José Fernández" 
+                  class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-udd-cyan transition-all">
+              </div>
+
+              <!-- CARGO CONTACTO -->
+              <div>
+                <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">
+                  Cargo del Contacto <span class="text-red-500">*</span>
+                </label>
+                <input 
+                  type="text" 
+                  v-model="form.cargoContacto" 
+                  required
+                  placeholder="Ej: Orientadora / Directora" 
+                  class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-udd-cyan transition-all">
+              </div>
+
+              <!-- EMAIL CONTACTO -->
+              <div>
+                <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">
+                  Email de Contacto <span class="text-red-500">*</span>
+                </label>
+                <input 
+                  type="email" 
+                  v-model="form.emailContacto" 
+                  required
+                  placeholder="correo@colegio.cl" 
+                  class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-udd-cyan transition-all">
+              </div>
+
+              <!-- CELULAR CONTACTO -->
+              <div>
+                <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">
+                  Celular de Contacto <span class="text-red-500">*</span>
+                </label>
+                <input 
+                  type="tel" 
+                  v-model="form.celularContacto" 
+                  required
+                  placeholder="+56 9 1234 5678" 
+                  class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-udd-cyan transition-all">
+              </div>
+            </div>
+
+            <!-- EJECUTIVO UDD A CARGO -->
+            <div class="bg-udd-lightCyan/60 p-5 rounded-2xl border border-udd-cyan/20 space-y-4">
+              <div>
+                <label class="block text-xs font-bold uppercase tracking-wider text-udd-navy mb-1">
+                  Ejecutivo UDD a Cargo <span class="text-red-500">*</span>
+                </label>
+                <select 
+                  v-model="selectedExecutiveIndex" 
+                  @change="onExecutiveSelect"
+                  required
+                  class="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl text-sm font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-udd-cyan transition-all">
+                  <option value="" disabled>Seleccione su Ejecutivo UDD</option>
+                  <option v-for="(ex, idx) in ejecutivosLista" :key="idx" :value="idx">
+                    {{ ex.nombre }} — ({{ ex.email }})
+                  </option>
+                  <option value="otro">Otro ejecutivo...</option>
+                </select>
+              </div>
+
+              <!-- Formulario desplegable para "Otro ejecutivo" -->
+              <div v-if="selectedExecutiveIndex === 'otro'" class="grid grid-cols-1 md:grid-cols-3 gap-3 pt-3 border-t border-udd-cyan/20">
+                <div>
+                  <label class="block text-[11px] font-bold text-slate-700 mb-1">Nombre Ejecutivo <span class="text-red-500">*</span></label>
+                  <input type="text" v-model="customExecutive.nombre" placeholder="Nombre completo" required class="w-full p-2.5 bg-white border rounded-lg text-xs">
+                </div>
+                <div>
+                  <label class="block text-[11px] font-bold text-slate-700 mb-1">Email Ejecutivo <span class="text-red-500">*</span></label>
+                  <input type="email" v-model="customExecutive.email" placeholder="correo@udd.cl" required class="w-full p-2.5 bg-white border rounded-lg text-xs">
+                </div>
+                <div>
+                  <label class="block text-[11px] font-bold text-slate-700 mb-1">Teléfono Ejecutivo <span class="text-red-500">*</span></label>
+                  <input type="tel" v-model="customExecutive.celular" placeholder="+56 9..." required class="w-full p-2.5 bg-white border rounded-lg text-xs">
+                </div>
+              </div>
+            </div>
+
+            <!-- Botones Paso 3 -->
+            <div class="flex justify-between pt-4 border-t border-slate-100">
+              <button 
+                type="button" 
+                @click="step = 2"
+                class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold px-5 py-3 rounded-xl transition-all flex items-center">
+                <i class="fa-solid fa-arrow-left mr-2"></i>
+                Anterior
+              </button>
+
+              <button 
+                type="submit" 
+                :disabled="!isStep3Valid || isSubmitting"
+                class="bg-udd-cyan hover:bg-udd-blue text-white font-extrabold px-8 py-3 rounded-xl transition-all flex items-center shadow-lg hover:shadow-xl transform active:scale-95 disabled:opacity-50">
+                <span v-if="!isSubmitting"><i class="fa-solid fa-paper-plane mr-2"></i> Finalizar Inscripción</span>
+                <span v-else class="flex items-center"><i class="fa-solid fa-circle-notch fa-spin mr-2"></i> Guardando...</span>
+              </button>
+            </div>
+          </div>
+
+        </form>
+
+      </div>
+    </main>
+
+    <!-- MODAL / COMPROBANTE OFICIAL (VOUCHER) -->
+    <div v-if="showVoucherModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm overflow-y-auto">
+      
+      <div id="printable-voucher" class="bg-white rounded-3xl shadow-2xl border border-slate-100 max-w-xl w-full p-6 sm:p-8 relative my-8">
+        
+        <!-- Header Comprobante con Logos -->
+        <div class="flex justify-between items-center border-b border-slate-100 pb-4 mb-6">
+          <div class="flex items-center space-x-3">
+            <img src="logo_udd.png" alt="UDD" class="h-8 w-auto" onerror="this.style.display='none'">
+            <span class="text-slate-300">|</span>
+            <img src="logo_promueva.png" alt="Promueva" class="h-8 w-auto" onerror="this.style.display='none'">
+          </div>
+          <div class="text-right">
+            <span class="text-[10px] font-bold text-slate-400 block uppercase">Código de Registro</span>
+            <span class="text-xs font-mono font-extrabold text-udd-blue bg-udd-lightCyan px-2.5 py-1 rounded-lg border border-udd-cyan/30">
+              {{ currentVoucher.codigoTracking }}
+            </span>
+          </div>
+        </div>
+
+        <!-- Mensaje exacto de confirmación solicitado -->
+        <div class="bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-2xl p-4 mb-6 flex items-start space-x-3 no-print">
+          <i class="fa-solid fa-circle-check text-emerald-600 text-xl mt-0.5"></i>
+          <div class="text-xs font-medium leading-relaxed">
+            <p class="font-bold text-sm text-emerald-900 mb-1">¡Inscripción recibida con éxito!</p>
+            <p>Se ha enviado una copia de este comprobante al correo <strong class="underline">{{ currentVoucher.emailContacto }}</strong>.</p>
+          </div>
+        </div>
+
+        <!-- Resumen de Datos de la Inscripción -->
+        <div class="space-y-4 text-xs">
+          
+          <div class="bg-slate-50 p-4 rounded-xl space-y-2 border border-slate-100">
+            <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Establecimiento</div>
+            <div class="flex justify-between"><span class="text-slate-500">Colegio:</span> <span class="font-bold text-udd-navy text-sm">{{ currentVoucher.nombreColegio }}</span></div>
+            <div class="flex justify-between"><span class="text-slate-500">RBD:</span> <span class="font-mono font-bold">{{ currentVoucher.rbd }}</span></div>
+            <div class="flex justify-between"><span class="text-slate-500">Comuna:</span> <span class="font-semibold">{{ currentVoucher.comuna }}</span></div>
+            <div class="flex justify-between"><span class="text-slate-500">Sede UDD:</span> <span class="font-bold text-udd-blue">{{ currentVoucher.sede }}</span></div>
+          </div>
+
+          <div class="bg-slate-50 p-4 rounded-xl space-y-2 border border-slate-100">
+            <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Cursos Inscritos y Fechas</div>
+            <div v-for="c in currentVoucher.cursosResumen" :key="c.nombre" class="flex justify-between items-center border-b border-slate-200/50 pb-1.5 last:border-b-0">
+              <span class="font-bold text-slate-700">{{ c.nombre }}</span>
+              <span class="text-slate-600">Fecha: {{ formatDate(c.fecha) }}</span>
+              <span class="font-mono font-bold bg-white px-2 py-0.5 rounded border text-[11px]">{{ c.alumnos }} estudiantes</span>
+            </div>
+          </div>
+
+          <div class="bg-slate-50 p-4 rounded-xl space-y-2 border border-slate-100">
+            <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Contacto del Colegio</div>
+            <div class="flex justify-between"><span class="text-slate-500">Nombre:</span> <span class="font-semibold">{{ currentVoucher.nombreContacto }}</span></div>
+            <div class="flex justify-between"><span class="text-slate-500">Cargo:</span> <span class="font-semibold">{{ currentVoucher.cargoContacto }}</span></div>
+            <div class="flex justify-between"><span class="text-slate-500">Email:</span> <span>{{ currentVoucher.emailContacto }}</span></div>
+            <div class="flex justify-between"><span class="text-slate-500">Teléfono:</span> <span class="font-mono">{{ currentVoucher.celularContacto }}</span></div>
+          </div>
+
+          <div class="bg-udd-lightCyan/50 p-4 rounded-xl space-y-1 border border-udd-cyan/20">
+            <div class="text-[10px] font-bold text-udd-navy uppercase tracking-wider mb-1">Ejecutivo UDD Asignado</div>
+            <div class="flex justify-between"><span class="text-slate-500">Ejecutivo:</span> <span class="font-bold text-udd-navy">{{ currentVoucher.ejecutivoUDD?.nombre }}</span></div>
+            <div class="flex justify-between"><span class="text-slate-500">Email:</span> <span>{{ currentVoucher.ejecutivoUDD?.email }}</span></div>
+            <div class="flex justify-between"><span class="text-slate-500">Teléfono:</span> <span class="font-mono">{{ currentVoucher.ejecutivoUDD?.celular }}</span></div>
+          </div>
+
+        </div>
+
+        <!-- Acciones del Voucher -->
+        <div class="mt-6 flex justify-end space-x-3 no-print">
+          <button @click="printVoucher" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold px-4 py-2.5 rounded-xl text-xs transition-all flex items-center">
+            <i class="fa-solid fa-print mr-2"></i> Imprimir / Guardar PDF
+          </button>
+          <button @click="closeVoucherModal" class="bg-udd-navy hover:bg-udd-blue text-white font-bold px-5 py-2.5 rounded-xl text-xs transition-all">
+            Cerrar
+          </button>
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- FOOTER INSTITUCIONAL -->
+    <footer class="bg-udd-navy text-slate-400 text-xs py-6 border-t border-udd-blue/30 mt-auto no-print">
+      <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row justify-between items-center space-y-3 sm:space-y-0">
+        <div class="flex items-center space-x-2">
+          <span class="text-white font-bold">Universidad del Desarrollo</span>
+          <span>&amp;</span>
+          <span class="text-white font-bold">Fundación Promueva</span>
+        </div>
+        <div class="text-slate-400 text-[11px]">
+          Test Vocacional • Admisión y Difusión
+        </div>
+      </div>
+    </footer>
+
+  </div>
+
+  <!-- LÓGICA VUE 3 -->
+  <script>
+    const { createApp, ref, computed, onMounted } = Vue;
+
+    createApp({
+      setup() {
+        const step = ref(1);
+        const isSubmitting = ref(false);
+
+        // Lista de Ejecutivos UDD
+        const ejecutivosLista = [
+          { nombre: 'Juan Lira', email: 'juan.lira@udd.cl', celular: '+56 9 9123 4567' },
+          { nombre: 'Valentina Rojas', email: 'vrojas@udd.cl', celular: '+56 9 8765 4321' },
+          { nombre: 'Gonzalo Morales', email: 'gmorales@udd.cl', celular: '+56 9 7112 3344' },
+          { nombre: 'Camila Silva', email: 'csilva@udd.cl', celular: '+56 9 5544 3322' }
+        ];
+
+        const selectedExecutiveIndex = ref(0);
+        const customExecutive = ref({ nombre: '', email: '', celular: '' });
+
+        // Estructura principal del Formulario
+        const form = ref({
+          sede: 'Santiago',
+          rbd: '',
+          nombreColegio: '',
+          comuna: '',
+          cursos: {
+            'II° Medio': { selected: true, fecha: '', alumnos: 35 },
+            'III° Medio': { selected: true, fecha: '', alumnos: 40 },
+            'IV° Medio': { selected: true, fecha: '', alumnos: 40 },
+            'Egresados': { selected: false, fecha: '', alumnos: 20 }
+          },
+          nombreContacto: '',
+          cargoContacto: '',
+          emailContacto: '',
+          celularContacto: '',
+          ejecutivoUDD: { ...ejecutivosLista[0] }
+        });
+
+        const rbdError = ref('');
+        const isRBDValid = ref(false);
+        const showVoucherModal = ref(false);
+        const currentVoucher = ref({});
+
+        // Validación matemática en segundo plano Módulo 11 (Sin mostrar el nombre de la fórmula)
+        function checkRBDValidity(rbdStr) {
+          if (!rbdStr || !rbdStr.includes('-')) return false;
+          
+          const parts = rbdStr.trim().split('-');
+          if (parts.length !== 2) return false;
+
+          const numStr = parts[0].replace(/\D/g, '');
+          const dv = parts[1].toUpperCase();
+
+          if (!numStr || dv.length !== 1) return false;
+
+          let sum = 0;
+          let multiplier = 2;
+
+          for (let i = numStr.length - 1; i >= 0; i--) {
+            sum += parseInt(numStr.charAt(i), 10) * multiplier;
+            multiplier = multiplier === 7 ? 2 : multiplier + 1;
+          }
+
+          const mod = 11 - (sum % 11);
+          let expectedDv = '';
+
+          if (mod === 11) expectedDv = '0';
+          else if (mod === 10) expectedDv = 'K';
+          else expectedDv = mod.toString();
+
+          return dv === expectedDv;
+        }
+
+        function validateRBDInput() {
+          if (!form.value.rbd) {
+            rbdError.value = '';
+            isRBDValid.value = false;
+            return;
+          }
+
+          if (!form.value.rbd.includes('-')) {
+            rbdError.value = 'Por favor incluya el guion y dígito verificador (ej. 8833-1)';
+            isRBDValid.value = false;
+            return;
+          }
+
+          const isValid = checkRBDValidity(form.value.rbd);
+          if (isValid) {
+            rbdError.value = '';
+            isRBDValid.value = true;
+          } else {
+            rbdError.value = 'El RBD ingresado no es válido. Verifique los dígitos e intente nuevamente.';
+            isRBDValid.value = false;
+          }
+        }
+
+        // Lógica de réplica automática de fechas en Paso 2
+        function onDateInput(changedCourseName) {
+          const selectedCoursesKeys = Object.keys(form.value.cursos).filter(k => form.value.cursos[k].selected);
+          
+          if (selectedCoursesKeys.length > 0 && selectedCoursesKeys[0] === changedCourseName) {
+            const primaryDate = form.value.cursos[changedCourseName].fecha;
+            selectedCoursesKeys.forEach(k => {
+              if (k !== changedCourseName) {
+                form.value.cursos[k].fecha = primaryDate;
+              }
+            });
+          }
+        }
+
+        function onCourseToggle(courseName) {
+          const selectedCoursesKeys = Object.keys(form.value.cursos).filter(k => form.value.cursos[k].selected);
+          if (selectedCoursesKeys.length > 0 && form.value.cursos[courseName].selected) {
+            const firstDate = form.value.cursos[selectedCoursesKeys[0]].fecha;
+            if (firstDate && !form.value.cursos[courseName].fecha) {
+              form.value.cursos[courseName].fecha = firstDate;
+            }
+          }
+        }
+
+        function onExecutiveSelect() {
+          if (selectedExecutiveIndex.value === 'otro') {
+            form.value.ejecutivoUDD = customExecutive.value;
+          } else {
+            form.value.ejecutivoUDD = { ...ejecutivosLista[selectedExecutiveIndex.value] };
+          }
+        }
+
+        // Validaciones por paso
+        const isStep1Valid = computed(() => {
+          return form.value.sede && form.value.rbd && isRBDValid.value && form.value.nombreColegio && form.value.comuna.trim().length > 0;
+        });
+
+        const hasSelectedCourses = computed(() => {
+          return Object.values(form.value.cursos).some(c => c.selected);
+        });
+
+        const isStep2Valid = computed(() => {
+          if (!hasSelectedCourses.value) return false;
+          return Object.values(form.value.cursos).every(c => {
+            if (!c.selected) return true;
+            return c.fecha && c.alumnos > 0;
+          });
+        });
+
+        const isStep3Valid = computed(() => {
+          const hasContacto = form.value.nombreContacto && form.value.cargoContacto && form.value.emailContacto && form.value.celularContacto;
+          if (selectedExecutiveIndex.value === 'otro') {
+            return hasContacto && customExecutive.value.nombre && customExecutive.value.email && customExecutive.value.celular;
+          }
+          return hasContacto && selectedExecutiveIndex.value !== '';
+        });
+
+        const stepProgressWidth = computed(() => {
+          if (step.value === 1) return '33%';
+          if (step.value === 2) return '66%';
+          return '100%';
+        });
+
+        function goToStep(s) {
+          if (s === 2 && !isStep1Valid.value) return;
+          if (s === 3 && (!isStep1Valid.value || !isStep2Valid.value)) return;
+          step.value = s;
+        }
+
+        function nextStep(current) {
+          if (current === 1 && isStep1Valid.value) step.value = 2;
+          if (current === 2 && isStep2Valid.value) step.value = 3;
+        }
+
+        // Proceso de Envío e Inscripción
+        function submitForm() {
+          if (!isStep3Valid.value) return;
+          isSubmitting.value = true;
+
+          setTimeout(() => {
+            // Leer inscripciones previas en localStorage para la secuencia
+            const existing = JSON.parse(localStorage.getItem('udd_vocacional_registros') || '[]');
+            const year = new Date().getFullYear();
+            const sedeSigla = form.value.sede === 'Santiago' ? 'SCL' : 'CCP';
+            const seqNumber = String(existing.length + 1).padStart(3, '0');
+            
+            // Formato exacto requerido: 2026-SCL-8833-1-001
+            const trackingCode = `${year}-${sedeSigla}-${form.value.rbd}-${seqNumber}`;
+
+            const cursosResumen = [];
+            let totalAlumnos = 0;
+            let resumenTextos = [];
+
+            Object.keys(form.value.cursos).forEach(k => {
+              if (form.value.cursos[k].selected) {
+                const c = form.value.cursos[k];
+                cursosResumen.push({
+                  nombre: k,
+                  fecha: c.fecha,
+                  alumnos: Number(c.alumnos)
+                });
+                totalAlumnos += Number(c.alumnos);
+                resumenTextos.push(`${k} (${c.fecha} - ${c.alumnos} est.)`);
+              }
+            });
+
+            const currentExec = selectedExecutiveIndex.value === 'otro' 
+              ? { ...customExecutive.value } 
+              : { ...ejecutivosLista[selectedExecutiveIndex.value] };
+
+            const newRecord = {
+              codigoTracking: trackingCode,
+              sede: form.value.sede,
+              rbd: form.value.rbd,
+              nombreColegio: form.value.nombreColegio,
+              comuna: form.value.comuna,
+              cursosResumen,
+              cursosResumenTexto: resumenTextos.join('; '),
+              totalAlumnos,
+              nombreContacto: form.value.nombreContacto,
+              cargoContacto: form.value.cargoContacto,
+              emailContacto: form.value.emailContacto,
+              celularContacto: form.value.celularContacto,
+              ejecutivoUDD: currentExec,
+              fechaInscripcion: new Date().toISOString()
+            };
+
+            // Guardar en localStorage
+            existing.unshift(newRecord);
+            localStorage.setItem('udd_vocacional_registros', JSON.stringify(existing));
+
+            currentVoucher.value = newRecord;
+            showVoucherModal.value = true;
+            isSubmitting.value = false;
+
+            // Resetear Formulario para una nueva sesión
+            resetForm();
+          }, 500);
+        }
+
+        function resetForm() {
+          const defaultDate = new Date();
+          defaultDate.setDate(defaultDate.getDate() + 14);
+          const defStr = defaultDate.toISOString().split('T')[0];
+
+          form.value = {
+            sede: 'Santiago',
+            rbd: '',
+            nombreColegio: '',
+            comuna: '',
+            cursos: {
+              'II° Medio': { selected: true, fecha: defStr, alumnos: 35 },
+              'III° Medio': { selected: true, fecha: defStr, alumnos: 40 },
+              'IV° Medio': { selected: true, fecha: defStr, alumnos: 40 },
+              'Egresados': { selected: false, fecha: defStr, alumnos: 20 }
+            },
+            nombreContacto: '',
+            cargoContacto: '',
+            emailContacto: '',
+            celularContacto: '',
+            ejecutivoUDD: { ...ejecutivosLista[0] }
+          };
+          selectedExecutiveIndex.value = 0;
+          customExecutive.value = { nombre: '', email: '', celular: '' };
+          rbdError.value = '';
+          isRBDValid.value = false;
+          step.value = 1;
+        }
+
+        function closeVoucherModal() {
+          showVoucherModal.value = false;
+        }
+
+        function printVoucher() {
+          window.print();
+        }
+
+        function formatDate(dateStr) {
+          if (!dateStr) return '-';
+          const p = dateStr.split('-');
+          if (p.length === 3) return `${p[2]}/${p[1]}/${p[0]}`;
+          return dateStr;
+        }
+
+        const minDate = computed(() => {
+          const today = new Date();
+          today.setDate(today.getDate() + 1);
+          return today.toISOString().split('T')[0];
+        });
+
+        onMounted(() => {
+          const defaultDate = new Date();
+          defaultDate.setDate(defaultDate.getDate() + 14);
+          const defStr = defaultDate.toISOString().split('T')[0];
+
+          form.value.cursos['II° Medio'].fecha = defStr;
+          form.value.cursos['III° Medio'].fecha = defStr;
+          form.value.cursos['IV° Medio'].fecha = defStr;
+          form.value.cursos['Egresados'].fecha = defStr;
+        });
+
+        return {
+          step,
+          form,
+          rbdError,
+          isRBDValid,
+          validateRBDInput,
+          onDateInput,
+          onCourseToggle,
+          ejecutivosLista,
+          selectedExecutiveIndex,
+          customExecutive,
+          onExecutiveSelect,
+          isStep1Valid,
+          hasSelectedCourses,
+          isStep2Valid,
+          isStep3Valid,
+          stepProgressWidth,
+          goToStep,
+          nextStep,
+          submitForm,
+          isSubmitting,
+          showVoucherModal,
+          currentVoucher,
+          closeVoucherModal,
+          printVoucher,
+          formatDate,
+          minDate
+        };
+      }
+    }).mount('#app');
+  </script>
+</body>
+</html>
