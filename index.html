@@ -87,6 +87,12 @@
             />
           </div>
 
+          <!-- TÍTULO CENTRAL INSTITUCIONAL -->
+          <div class="text-center hidden sm:block px-4">
+            <h1 class="text-base sm:text-lg font-extrabold text-udd-navy tracking-tight">Test de Orientación Vocacional UDD 2026</h1>
+            <p class="text-[11px] font-semibold text-slate-500">Universidad del Desarrollo &amp; Fundación Promueva</p>
+          </div>
+
           <!-- LOGO FUNDACIÓN PROMUEVA -->
           <div class="flex items-center">
             <img 
@@ -104,25 +110,104 @@
     <!-- CONTENIDO PRINCIPAL -->
     <main class="flex-grow py-8 px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto w-full">
       
-      <!-- Stepper / Indicador de Pasos -->
-      <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200/80 mb-8">
-        <div class="relative">
-          <!-- Barra de Progreso -->
-          <div class="overflow-hidden h-2 mb-6 text-xs flex rounded-full bg-slate-100">
+      <!-- VISTA 1: PANTALLA INTEGRADA DE CONFIRMACIÓN (COMPROBANTE INLINE) -->
+      <div v-if="submitted" class="bg-white rounded-2xl shadow-xl border border-slate-200/80 p-6 sm:p-8 space-y-6">
+        
+        <!-- Header Comprobante -->
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-slate-100 pb-4 gap-4">
+          <div class="flex items-center space-x-3">
+            <img src="logo_udd.png" alt="UDD" class="h-8 w-auto" onerror="this.style.display='none'">
+            <span class="text-slate-300">|</span>
+            <img src="logo_promueva.png" alt="Promueva" class="h-8 w-auto" onerror="this.style.display='none'">
+          </div>
+          <div class="text-left sm:text-right">
+            <span class="text-[10px] font-bold text-slate-400 block uppercase">Código de Registro</span>
+            <span class="text-xs font-mono font-extrabold text-udd-blue bg-udd-lightCyan px-3 py-1.5 rounded-lg border border-udd-cyan/30">
+              {{ currentVoucher.codigoTracking }}
+            </span>
+          </div>
+        </div>
+
+        <!-- Mensaje de confirmación personalizado -->
+        <div class="bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-2xl p-4 flex items-start space-x-3">
+          <i class="fa-solid fa-circle-check text-emerald-600 text-xl mt-0.5"></i>
+          <div class="text-xs font-medium leading-relaxed">
+            <p class="font-bold text-sm text-emerald-900 mb-1">¡Inscripción recibida con éxito!</p>
+            <p>Estimado(a) <strong>{{ currentVoucher.nombreContacto }}</strong>, confirmamos la recepción de la inscripción de su establecimiento. Pronto nos pondremos en contacto para coordinar los detalles.</p>
+          </div>
+        </div>
+
+        <!-- Resumen de Datos -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+          
+          <div class="bg-slate-50 p-4 rounded-xl space-y-2 border border-slate-100">
+            <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Establecimiento</div>
+            <div class="flex justify-between"><span class="text-slate-500">Colegio:</span> <span class="font-bold text-udd-navy text-sm">{{ currentVoucher.nombreColegio }}</span></div>
+            <div class="flex justify-between"><span class="text-slate-500">RBD:</span> <span class="font-mono font-bold">{{ currentVoucher.rbd }}</span></div>
+            <div class="flex justify-between"><span class="text-slate-500">Comuna:</span> <span class="font-semibold">{{ currentVoucher.comuna }}</span></div>
+            <div class="flex justify-between"><span class="text-slate-500">Sede UDD:</span> <span class="font-bold text-udd-blue">{{ currentVoucher.sede }}</span></div>
+          </div>
+
+          <div class="bg-slate-50 p-4 rounded-xl space-y-2 border border-slate-100">
+            <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Contacto del Colegio</div>
+            <div class="flex justify-between"><span class="text-slate-500">Nombre:</span> <span class="font-semibold">{{ currentVoucher.nombreContacto }}</span></div>
+            <div class="flex justify-between"><span class="text-slate-500">Cargo:</span> <span class="font-semibold">{{ currentVoucher.cargoContacto }}</span></div>
+            <div class="flex justify-between"><span class="text-slate-500">Email:</span> <span>{{ currentVoucher.emailContacto }}</span></div>
+            <div class="flex justify-between"><span class="text-slate-500">Teléfono:</span> <span class="font-mono">{{ currentVoucher.celularContacto }}</span></div>
+          </div>
+
+          <div class="bg-slate-50 p-4 rounded-xl space-y-2 border border-slate-100 md:col-span-2">
+            <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Cursos Inscritos y Fechas</div>
+            <div v-for="c in currentVoucher.cursosResumen" :key="c.nombre" class="flex justify-between items-center border-b border-slate-200/50 pb-1.5 last:border-b-0">
+              <span class="font-bold text-slate-700">{{ c.nombre }}</span>
+              <span class="text-slate-600">Fecha: {{ formatDate(c.fecha) }}</span>
+              <span class="font-mono font-bold bg-white px-2 py-0.5 rounded border text-[11px]">{{ c.alumnos }} estudiantes</span>
+            </div>
+            <div class="pt-2 border-t border-slate-200 flex justify-between font-bold text-udd-navy">
+              <span>Total Estudiantes Evaluados:</span>
+              <span class="font-mono">{{ currentVoucher.totalAlumnos }} estudiantes</span>
+            </div>
+          </div>
+
+          <div class="bg-udd-lightCyan/50 p-4 rounded-xl space-y-1 border border-udd-cyan/20 md:col-span-2">
+            <div class="text-[10px] font-bold text-udd-navy uppercase tracking-wider mb-1">Contacto UDD Asignado</div>
+            <div class="flex justify-between"><span class="text-slate-500">Contacto:</span> <span class="font-bold text-udd-navy">{{ currentVoucher.ejecutivoUDD?.nombre }}</span></div>
+            <div class="flex justify-between"><span class="text-slate-500">Email:</span> <span>{{ currentVoucher.ejecutivoUDD?.email }}</span></div>
+            <div class="flex justify-between"><span class="text-slate-500">Teléfono:</span> <span class="font-mono">{{ currentVoucher.ejecutivoUDD?.celular }}</span></div>
+          </div>
+
+        </div>
+
+        <!-- Botonera de la pantalla de confirmación: únicamente botón VOLVER -->
+        <div class="pt-4 border-t border-slate-100 flex justify-end">
+          <button @click="resetFormAndReturn" class="bg-udd-navy hover:bg-udd-blue text-white font-bold px-8 py-3 rounded-xl transition-all shadow-md">
+            Volver
+          </button>
+        </div>
+
+      </div>
+
+      <!-- VISTA 2: FORMULARIO PRINCIPAL INTEGRADO CON STEPPER EN EL TOPE -->
+      <div v-else class="bg-white rounded-2xl shadow-xl border border-slate-200/80 overflow-hidden">
+        
+        <!-- STEPPER INTEGRADO EN EL TOPE (OPCIÓN 2: BARRA EN EL TOPE + PASOS FLOTANTES) -->
+        <div class="bg-slate-50/70 border-b border-slate-200/80 p-6">
+          <!-- Barra de Progreso Top (Opción 2) -->
+          <div class="overflow-hidden h-1.5 mb-5 text-xs flex rounded-full bg-slate-200">
             <div 
               class="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-udd-cyan transition-all duration-300"
               :style="{ width: stepProgressWidth }">
             </div>
           </div>
 
-          <!-- Pasos -->
+          <!-- Indicadores de Pasos -->
           <div class="grid grid-cols-3 text-center">
             <!-- Paso 1 -->
             <div class="cursor-pointer group" @click="goToStep(1)">
               <div 
                 :class="[
-                  step >= 1 ? 'bg-udd-navy text-white ring-4 ring-udd-lightCyan' : 'bg-slate-100 text-slate-400',
-                  'w-10 h-10 rounded-full flex items-center justify-center font-bold mx-auto mb-2 transition-all'
+                  step >= 1 ? 'bg-udd-navy text-white ring-4 ring-udd-lightCyan' : 'bg-slate-200 text-slate-500',
+                  'w-9 h-9 rounded-full flex items-center justify-center font-bold mx-auto mb-1.5 transition-all text-sm'
                 ]">
                 <i v-if="step > 1" class="fa-solid fa-check text-udd-cyan"></i>
                 <span v-else>1</span>
@@ -134,8 +219,8 @@
             <div class="cursor-pointer group" @click="goToStep(2)">
               <div 
                 :class="[
-                  step >= 2 ? 'bg-udd-navy text-white ring-4 ring-udd-lightCyan' : 'bg-slate-100 text-slate-400',
-                  'w-10 h-10 rounded-full flex items-center justify-center font-bold mx-auto mb-2 transition-all'
+                  step >= 2 ? 'bg-udd-navy text-white ring-4 ring-udd-lightCyan' : 'bg-slate-200 text-slate-500',
+                  'w-9 h-9 rounded-full flex items-center justify-center font-bold mx-auto mb-1.5 transition-all text-sm'
                 ]">
                 <i v-if="step > 2" class="fa-solid fa-check text-udd-cyan"></i>
                 <span v-else>2</span>
@@ -148,7 +233,7 @@
               <div 
                 :class="[
                   step >= 3 ? 'bg-udd-navy text-white ring-4 ring-udd-lightCyan' : 'bg-slate-100 text-slate-400',
-                  'w-10 h-10 rounded-full flex items-center justify-center font-bold mx-auto mb-2 transition-all'
+                  'w-9 h-9 rounded-full flex items-center justify-center font-bold mx-auto mb-1.5 transition-all text-sm'
                 ]">
                 <span>3</span>
               </div>
@@ -156,391 +241,309 @@
             </div>
           </div>
         </div>
-      </div>
 
-      <!-- Form Card principal -->
-      <div class="bg-white rounded-2xl shadow-xl border border-slate-200/80 p-6 sm:p-8">
-        
-        <form @submit.prevent="submitForm">
+        <div class="p-6 sm:p-8">
+          <form @submit.prevent="submitForm">
 
-          <!-- PASO 1: INSCRIPCIÓN COLEGIO -->
-          <div v-show="step === 1" class="space-y-6">
-            <div class="border-b border-slate-100 pb-4">
-              <h3 class="text-xl font-bold text-udd-navy flex items-center">
-                <i class="fa-solid fa-school text-udd-cyan mr-3"></i>
-                Paso 1: Inscripción Colegio
-              </h3>
-              <p class="text-xs text-slate-500 mt-1">Ingrese los datos de identificación de su colegio.</p>
-            </div>
-
-            <!-- SELECCIÓN DE SEDE -->
-            <div>
-              <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-2">
-                Sede UDD <span class="text-red-500">*</span>
-              </label>
-              <div class="grid grid-cols-2 gap-4">
-                <label 
-                  :class="form.sede === 'Santiago' ? 'border-udd-cyan bg-udd-lightCyan text-udd-navy ring-2 ring-udd-cyan/30' : 'border-slate-200 hover:border-slate-300 text-slate-600'"
-                  class="flex items-center p-4 border rounded-xl cursor-pointer transition-all">
-                  <input type="radio" v-model="form.sede" value="Santiago" class="text-udd-cyan focus:ring-udd-cyan h-4 w-4">
-                  <span class="ml-3 font-bold text-base">Santiago</span>
-                </label>
-
-                <label 
-                  :class="form.sede === 'Concepción' ? 'border-udd-cyan bg-udd-lightCyan text-udd-navy ring-2 ring-udd-cyan/30' : 'border-slate-200 hover:border-slate-300 text-slate-600'"
-                  class="flex items-center p-4 border rounded-xl cursor-pointer transition-all">
-                  <input type="radio" v-model="form.sede" value="Concepción" class="text-udd-cyan focus:ring-udd-cyan h-4 w-4">
-                  <span class="ml-3 font-bold text-base">Concepción</span>
-                </label>
+            <!-- PASO 1: INSCRIPCIÓN COLEGIO -->
+            <div v-show="step === 1" class="space-y-6">
+              <div class="border-b border-slate-100 pb-4">
+                <h3 class="text-xl font-bold text-udd-navy flex items-center">
+                  <i class="fa-solid fa-school text-udd-cyan mr-3"></i>
+                  Paso 1: Inscripción Colegio
+                </h3>
+                <p class="text-xs text-slate-500 mt-1">Ingrese los datos de identificación de su colegio.</p>
               </div>
-            </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <!-- RBD DEL COLEGIO -->
+              <!-- SELECCIÓN DE SEDE -->
               <div>
-                <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">
-                  RBD Colegio (con guion) <span class="text-red-500">*</span>
+                <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-2">
+                  Sede UDD <span class="text-red-500">*</span>
                 </label>
-                <input 
-                  type="text" 
-                  v-model="form.rbd" 
-                  @input="onRBDInput"
-                  @blur="validateRBDOnBlur"
-                  placeholder="Ej: 8833-1" 
-                  required
-                  :class="[
-                    rbdError ? 'border-red-400 bg-red-50 focus:ring-red-400' : 'border-slate-200 focus:ring-udd-cyan',
-                    'w-full px-4 py-3 bg-slate-50 border rounded-xl text-sm focus:bg-white focus:outline-none focus:ring-2 font-mono font-bold transition-all'
-                  ]">
-                
-                <span v-if="rbdError" class="text-xs text-red-600 font-semibold mt-1 block">
-                  <i class="fa-solid fa-triangle-exclamation mr-1"></i> {{ rbdError }}
-                </span>
-                <span v-else-if="form.rbd && isRBDValid" class="text-xs text-emerald-600 font-semibold mt-1 block">
-                  <i class="fa-solid fa-circle-check mr-1"></i> RBD Válido
-                </span>
-                <span v-else class="text-[11px] text-slate-400 mt-1 block">Formato: número-dígito (ej. 8833-1)</span>
-              </div>
-
-              <!-- NOMBRE COLEGIO -->
-              <div class="md:col-span-2">
-                <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">
-                  Nombre del Colegio <span class="text-red-500">*</span>
-                </label>
-                <input 
-                  type="text" 
-                  v-model="form.nombreColegio" 
-                  required
-                  placeholder="Ingrese el nombre completo del colegio" 
-                  class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-udd-cyan transition-all">
-              </div>
-            </div>
-
-            <!-- COMUNA -->
-            <div>
-              <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">
-                Comuna <span class="text-red-500">*</span>
-              </label>
-              <input 
-                type="text" 
-                v-model="form.comuna" 
-                required
-                placeholder="Escriba la comuna correspondiente" 
-                class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-udd-cyan transition-all">
-            </div>
-
-            <!-- Botón Paso 1 -->
-            <div class="flex justify-end pt-4 border-t border-slate-100">
-              <button 
-                type="button" 
-                @click="nextStep(1)"
-                class="bg-udd-navy hover:bg-udd-blue text-white font-bold px-6 py-3 rounded-xl transition-all flex items-center shadow-md">
-                Siguiente: Cursos y Fechas
-                <i class="fa-solid fa-arrow-right ml-2"></i>
-              </button>
-            </div>
-          </div>
-
-          <!-- PASO 2: CURSOS Y FECHAS -->
-          <div v-show="step === 2" class="space-y-6">
-            <div class="border-b border-slate-100 pb-4">
-              <h3 class="text-xl font-bold text-udd-navy flex items-center">
-                <i class="fa-solid fa-calendar-days text-udd-cyan mr-3"></i>
-                Paso 2: Cursos y Fechas
-              </h3>
-              <p class="text-xs text-slate-500 mt-1">Seleccione los niveles a evaluar. La fecha del primer curso seleccionado se copiará a los demás.</p>
-            </div>
-
-            <!-- Lista de Cursos -->
-            <div class="space-y-4">
-              <div 
-                v-for="(cData, cName) in form.cursos" 
-                :key="cName"
-                :class="cData.selected ? 'border-udd-cyan bg-udd-lightCyan/40 ring-1 ring-udd-cyan/30' : 'border-slate-200 bg-slate-50'"
-                class="p-4 rounded-xl border transition-all">
-                
-                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                  
-                  <!-- Checkbox Selección -->
-                  <label class="flex items-center cursor-pointer min-w-[160px]">
-                    <input 
-                      type="checkbox" 
-                      v-model="cData.selected" 
-                      @change="onCourseToggle(cName)"
-                      class="h-5 w-5 rounded border-slate-300 text-udd-cyan focus:ring-udd-cyan">
-                    <span class="ml-3 font-extrabold text-slate-800 text-base">{{ cName }}</span>
+                <div class="grid grid-cols-2 gap-4">
+                  <label 
+                    :class="form.sede === 'Santiago' ? 'border-udd-cyan bg-udd-lightCyan text-udd-navy ring-2 ring-udd-cyan/30' : 'border-slate-200 hover:border-slate-300 text-slate-600'"
+                    class="flex items-center p-4 border rounded-xl cursor-pointer transition-all">
+                    <input type="radio" v-model="form.sede" value="Santiago" class="text-udd-cyan focus:ring-udd-cyan h-4 w-4">
+                    <span class="ml-3 font-bold text-base">Santiago</span>
                   </label>
 
-                  <!-- Inputs Fecha y Alumnos -->
-                  <div v-if="cData.selected" class="grid grid-cols-1 sm:grid-cols-2 gap-3 flex-grow max-w-xl">
-                    <div>
-                      <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-600 mb-1">
-                        Fecha aproximada de aplicación
-                      </label>
-                      <input 
-                        type="date" 
-                        v-model="cData.fecha"
-                        @input="onDateInput(cName)"
-                        :min="minDate"
-                        required
-                        class="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-udd-cyan">
-                    </div>
-
-                    <div>
-                      <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-600 mb-1">
-                        Estudiantes aproximados
-                      </label>
-                      <input 
-                        type="number" 
-                        v-model="cData.alumnos" 
-                        min="1" 
-                        max="1000"
-                        required
-                        placeholder="Cantidad est."
-                        class="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-xs font-mono font-bold focus:outline-none focus:ring-2 focus:ring-udd-cyan">
-                    </div>
-                  </div>
-
-                  <div v-else class="text-xs text-slate-400 italic">
-                    Marque la casilla para habilitar este nivel.
-                  </div>
-
+                  <label 
+                    :class="form.sede === 'Concepción' ? 'border-udd-cyan bg-udd-lightCyan text-udd-navy ring-2 ring-udd-cyan/30' : 'border-slate-200 hover:border-slate-300 text-slate-600'"
+                    class="flex items-center p-4 border rounded-xl cursor-pointer transition-all">
+                    <input type="radio" v-model="form.sede" value="Concepción" class="text-udd-cyan focus:ring-udd-cyan h-4 w-4">
+                    <span class="ml-3 font-bold text-base">Concepción</span>
+                  </label>
                 </div>
               </div>
-            </div>
 
-            <div v-if="!hasSelectedCourses" class="p-3 bg-amber-50 border border-amber-200 rounded-xl text-amber-800 text-xs flex items-center">
-              <i class="fa-solid fa-circle-info text-amber-600 mr-2 text-base"></i>
-              Debe seleccionar al menos un curso para avanzar.
-            </div>
+              <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <!-- RBD DEL COLEGIO -->
+                <div>
+                  <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">
+                    RBD Colegio (con guion) <span class="text-red-500">*</span>
+                  </label>
+                  <input 
+                    type="text" 
+                    v-model="form.rbd" 
+                    @input="onRBDInput"
+                    @blur="validateRBDOnBlur"
+                    placeholder="Ej: 8833-1" 
+                    required
+                    :class="[
+                      rbdError ? 'border-red-400 bg-red-50 focus:ring-red-400' : 'border-slate-200 focus:ring-udd-cyan',
+                      'w-full px-4 py-3 bg-slate-50 border rounded-xl text-sm focus:bg-white focus:outline-none focus:ring-2 font-mono font-bold transition-all'
+                    ]">
+                  
+                  <span v-if="rbdError" class="text-xs text-red-600 font-semibold mt-1 block">
+                    <i class="fa-solid fa-triangle-exclamation mr-1"></i> {{ rbdError }}
+                  </span>
+                  <span v-else-if="form.rbd && isRBDValid" class="text-xs text-emerald-600 font-semibold mt-1 block">
+                    <i class="fa-solid fa-circle-check mr-1"></i> RBD Válido
+                  </span>
+                  <span v-else class="text-[11px] text-slate-400 mt-1 block">Formato: número-dígito (ej. 8833-1)</span>
+                </div>
 
-            <!-- Botones Paso 2 -->
-            <div class="flex justify-between pt-4 border-t border-slate-100">
-              <button 
-                type="button" 
-                @click="step = 1"
-                class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold px-5 py-3 rounded-xl transition-all flex items-center">
-                <i class="fa-solid fa-arrow-left mr-2"></i>
-                Anterior
-              </button>
+                <!-- NOMBRE COLEGIO -->
+                <div class="md:col-span-2">
+                  <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">
+                    Nombre del Colegio <span class="text-red-500">*</span>
+                  </label>
+                  <input 
+                    type="text" 
+                    v-model="form.nombreColegio" 
+                    required
+                    placeholder="Ingrese el nombre completo del colegio" 
+                    class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-udd-cyan transition-all">
+                </div>
+              </div>
 
-              <button 
-                type="button" 
-                @click="nextStep(2)"
-                class="bg-udd-navy hover:bg-udd-blue text-white font-bold px-6 py-3 rounded-xl transition-all flex items-center shadow-md">
-                Siguiente: Contacto
-                <i class="fa-solid fa-arrow-right ml-2"></i>
-              </button>
-            </div>
-          </div>
-
-          <!-- PASO 3: CONTACTO -->
-          <div v-show="step === 3" class="space-y-6">
-            <div class="border-b border-slate-100 pb-4">
-              <h3 class="text-xl font-bold text-udd-navy flex items-center">
-                <i class="fa-solid fa-id-card text-udd-cyan mr-3"></i>
-                Paso 3: Contacto
-              </h3>
-              <p class="text-xs text-slate-500 mt-1">Ingrese los datos de la persona de contacto en el establecimiento y seleccione su Contacto UDD.</p>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <!-- NOMBRE CONTACTO -->
+              <!-- COMUNA -->
               <div>
                 <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">
-                  Nombre del Contacto <span class="text-red-500">*</span>
+                  Comuna <span class="text-red-500">*</span>
                 </label>
                 <input 
                   type="text" 
-                  v-model="form.nombreContacto" 
+                  v-model="form.comuna" 
                   required
-                  placeholder="Ej: María José Fernández" 
+                  placeholder="Escriba la comuna correspondiente" 
                   class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-udd-cyan transition-all">
               </div>
 
-              <!-- CARGO CONTACTO -->
-              <div>
-                <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">
-                  Cargo del Contacto <span class="text-red-500">*</span>
-                </label>
-                <input 
-                  type="text" 
-                  v-model="form.cargoContacto" 
-                  required
-                  placeholder="Ej: Orientadora / Directora" 
-                  class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-udd-cyan transition-all">
-              </div>
-
-              <!-- EMAIL CONTACTO -->
-              <div>
-                <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">
-                  Email de Contacto <span class="text-red-500">*</span>
-                </label>
-                <input 
-                  type="email" 
-                  v-model="form.emailContacto" 
-                  required
-                  placeholder="correo@colegio.cl" 
-                  class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-udd-cyan transition-all">
-              </div>
-
-              <!-- CELULAR CONTACTO -->
-              <div>
-                <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">
-                  Celular de Contacto <span class="text-red-500">*</span>
-                </label>
-                <input 
-                  type="tel" 
-                  v-model="form.celularContacto" 
-                  required
-                  placeholder="+56 9 1234 5678" 
-                  class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-udd-cyan transition-all">
+              <!-- Botón Paso 1: "Siguiente" -->
+              <div class="flex justify-end pt-4 border-t border-slate-100">
+                <button 
+                  type="button" 
+                  @click="nextStep(1)"
+                  class="bg-udd-navy hover:bg-udd-blue text-white font-bold px-6 py-3 rounded-xl transition-all flex items-center shadow-md">
+                  Siguiente
+                  <i class="fa-solid fa-arrow-right ml-2"></i>
+                </button>
               </div>
             </div>
 
-            <!-- CONTACTO UDD (DESPLEGABLE DINÁMICO SANITIZADO) -->
-            <div class="bg-udd-lightCyan/60 p-5 rounded-2xl border border-udd-cyan/20 space-y-4">
-              <div>
-                <label class="block text-xs font-bold uppercase tracking-wider text-udd-navy mb-1">
-                  Contacto UDD <span class="text-red-500">*</span>
-                </label>
-                <select 
-                  v-model="selectedExecutiveIndex" 
-                  @change="onExecutiveSelect"
-                  required
-                  class="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl text-sm font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-udd-cyan transition-all">
-                  <option value="" disabled>Seleccione su Contacto UDD</option>
-                  <option v-for="(ex, idx) in ejecutivosFiltrados" :key="idx" :value="idx">
-                    {{ ex.nombre }} — ({{ ex.email }})
-                  </option>
-                </select>
+            <!-- PASO 2: CURSOS Y FECHAS -->
+            <div v-show="step === 2" class="space-y-6">
+              <div class="border-b border-slate-100 pb-4">
+                <h3 class="text-xl font-bold text-udd-navy flex items-center">
+                  <i class="fa-solid fa-calendar-days text-udd-cyan mr-3"></i>
+                  Paso 2: Cursos y Fechas
+                </h3>
+                <p class="text-xs text-slate-500 mt-1">Seleccione los niveles a evaluar. La fecha del primer curso seleccionado se copiará a los demás.</p>
+              </div>
+
+              <!-- Lista de Cursos -->
+              <div class="space-y-4">
+                <div 
+                  v-for="(cData, cName) in form.cursos" 
+                  :key="cName"
+                  :class="cData.selected ? 'border-udd-cyan bg-udd-lightCyan/40 ring-1 ring-udd-cyan/30' : 'border-slate-200 bg-slate-50'"
+                  class="p-4 rounded-xl border transition-all">
+                  
+                  <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    
+                    <!-- Checkbox Selección -->
+                    <label class="flex items-center cursor-pointer min-w-[150px]">
+                      <input 
+                        type="checkbox" 
+                        v-model="cData.selected" 
+                        @change="onCourseToggle(cName)"
+                        class="h-5 w-5 rounded border-slate-300 text-udd-cyan focus:ring-udd-cyan">
+                      <span class="ml-3 font-extrabold text-slate-800 text-base">{{ cName }}</span>
+                    </label>
+
+                    <!-- Inputs Fecha y Alumnos Acortados (max-w-[170px]) -->
+                    <div v-if="cData.selected" class="flex flex-wrap sm:flex-nowrap items-center gap-3">
+                      <div>
+                        <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-600 mb-1">
+                          Fecha aplicación
+                        </label>
+                        <input 
+                          type="date" 
+                          v-model="cData.fecha"
+                          @input="onDateInput(cName)"
+                          :min="minDate"
+                          required
+                          class="w-full max-w-[170px] px-3 py-2 bg-white border border-slate-200 rounded-lg text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-udd-cyan">
+                      </div>
+
+                      <div>
+                        <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-600 mb-1">
+                          Estudiantes approx.
+                        </label>
+                        <input 
+                          type="number" 
+                          v-model="cData.alumnos" 
+                          min="1" 
+                          max="1000"
+                          required
+                          placeholder="Cantidad"
+                          class="w-full max-w-[130px] px-3 py-2 bg-white border border-slate-200 rounded-lg text-xs font-mono font-bold focus:outline-none focus:ring-2 focus:ring-udd-cyan">
+                      </div>
+                    </div>
+
+                    <div v-else class="text-xs text-slate-400 italic">
+                      Marque la casilla para habilitar este nivel.
+                    </div>
+
+                  </div>
+                </div>
+              </div>
+
+              <div v-if="!hasSelectedCourses" class="p-3 bg-amber-50 border border-amber-200 rounded-xl text-amber-800 text-xs flex items-center">
+                <i class="fa-solid fa-circle-info text-amber-600 mr-2 text-base"></i>
+                Debe seleccionar al menos un curso para avanzar.
+              </div>
+
+              <!-- Botones Paso 2: "Siguiente" -->
+              <div class="flex justify-between pt-4 border-t border-slate-100">
+                <button 
+                  type="button" 
+                  @click="step = 1"
+                  class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold px-5 py-3 rounded-xl transition-all flex items-center">
+                  <i class="fa-solid fa-arrow-left mr-2"></i>
+                  Anterior
+                </button>
+
+                <button 
+                  type="button" 
+                  @click="nextStep(2)"
+                  class="bg-udd-navy hover:bg-udd-blue text-white font-bold px-6 py-3 rounded-xl transition-all flex items-center shadow-md">
+                  Siguiente
+                  <i class="fa-solid fa-arrow-right ml-2"></i>
+                </button>
               </div>
             </div>
 
-            <!-- Botones Paso 3 -->
-            <div class="flex justify-between pt-4 border-t border-slate-100">
-              <button 
-                type="button" 
-                @click="step = 2"
-                class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold px-5 py-3 rounded-xl transition-all flex items-center">
-                <i class="fa-solid fa-arrow-left mr-2"></i>
-                Anterior
-              </button>
+            <!-- PASO 3: CONTACTO -->
+            <div v-show="step === 3" class="space-y-6">
+              <div class="border-b border-slate-100 pb-4">
+                <h3 class="text-xl font-bold text-udd-navy flex items-center">
+                  <i class="fa-solid fa-id-card text-udd-cyan mr-3"></i>
+                  Paso 3: Contacto
+                </h3>
+                <p class="text-xs text-slate-500 mt-1">Ingrese los datos de la persona de contacto en el establecimiento y seleccione su Contacto UDD.</p>
+              </div>
 
-              <button 
-                type="submit" 
-                :disabled="isSubmitting"
-                class="bg-udd-cyan hover:bg-udd-blue text-white font-extrabold px-8 py-3 rounded-xl transition-all flex items-center shadow-lg hover:shadow-xl transform active:scale-95 disabled:opacity-50">
-                <span v-if="!isSubmitting"><i class="fa-solid fa-paper-plane mr-2"></i> Finalizar Inscripción</span>
-                <span v-else class="flex items-center"><i class="fa-solid fa-circle-notch fa-spin mr-2"></i> Guardando...</span>
-              </button>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <!-- NOMBRE CONTACTO -->
+                <div>
+                  <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">
+                    Nombre del Contacto <span class="text-red-500">*</span>
+                  </label>
+                  <input 
+                    type="text" 
+                    v-model="form.nombreContacto" 
+                    required
+                    placeholder="Ej: María José Fernández" 
+                    class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-udd-cyan transition-all">
+                </div>
+
+                <!-- CARGO CONTACTO -->
+                <div>
+                  <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">
+                    Cargo del Contacto <span class="text-red-500">*</span>
+                  </label>
+                  <input 
+                    type="text" 
+                    v-model="form.cargoContacto" 
+                    required
+                    placeholder="Ej: Orientadora / Directora" 
+                    class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-udd-cyan transition-all">
+                </div>
+
+                <!-- EMAIL CONTACTO -->
+                <div>
+                  <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">
+                    Email de Contacto <span class="text-red-500">*</span>
+                  </label>
+                  <input 
+                    type="email" 
+                    v-model="form.emailContacto" 
+                    required
+                    placeholder="correo@colegio.cl" 
+                    class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-udd-cyan transition-all">
+                </div>
+
+                <!-- CELULAR CONTACTO -->
+                <div>
+                  <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">
+                    Celular de Contacto <span class="text-red-500">*</span>
+                  </label>
+                  <input 
+                    type="tel" 
+                    v-model="form.celularContacto" 
+                    required
+                    placeholder="+56 9 1234 5678" 
+                    class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-udd-cyan transition-all">
+                </div>
+              </div>
+
+              <!-- CONTACTO UDD (DESPLEGABLE DINÁMICO SANITIZADO) -->
+              <div class="bg-udd-lightCyan/60 p-5 rounded-2xl border border-udd-cyan/20 space-y-4">
+                <div>
+                  <label class="block text-xs font-bold uppercase tracking-wider text-udd-navy mb-1">
+                    Contacto UDD <span class="text-red-500">*</span>
+                  </label>
+                  <select 
+                    v-model="selectedExecutiveIndex" 
+                    @change="onExecutiveSelect"
+                    required
+                    class="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl text-sm font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-udd-cyan transition-all">
+                    <option value="" disabled selected>-- Seleccione Contacto UDD --</option>
+                    <option v-for="(ex, idx) in ejecutivosFiltrados" :key="idx" :value="idx">
+                      {{ ex.nombre }} — ({{ ex.email }})
+                    </option>
+                  </select>
+                </div>
+              </div>
+
+              <!-- Botones Paso 3 -->
+              <div class="flex justify-between pt-4 border-t border-slate-100">
+                <button 
+                  type="button" 
+                  @click="step = 2"
+                  class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold px-5 py-3 rounded-xl transition-all flex items-center">
+                  <i class="fa-solid fa-arrow-left mr-2"></i>
+                  Anterior
+                </button>
+
+                <button 
+                  type="submit" 
+                  :disabled="isSubmitting"
+                  class="bg-udd-cyan hover:bg-udd-blue text-white font-extrabold px-8 py-3 rounded-xl transition-all flex items-center shadow-lg hover:shadow-xl transform active:scale-95 disabled:opacity-50">
+                  <span v-if="!isSubmitting"><i class="fa-solid fa-paper-plane mr-2"></i> Finalizar Inscripción</span>
+                  <span v-else class="flex items-center"><i class="fa-solid fa-circle-notch fa-spin mr-2"></i> Guardando...</span>
+                </button>
+              </div>
             </div>
-          </div>
 
-        </form>
+          </form>
+        </div>
 
       </div>
     </main>
-
-    <!-- MODAL / COMPROBANTE OFICIAL (VOUCHER) -->
-    <div v-if="showVoucherModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm overflow-y-auto">
-      
-      <div id="printable-voucher" class="bg-white rounded-3xl shadow-2xl border border-slate-100 max-w-xl w-full p-6 sm:p-8 relative my-8">
-        
-        <!-- Header Comprobante -->
-        <div class="flex justify-between items-center border-b border-slate-100 pb-4 mb-6">
-          <div class="flex items-center space-x-3">
-            <img src="logo_udd.png" alt="UDD" class="h-8 w-auto" onerror="this.style.display='none'">
-            <span class="text-slate-300">|</span>
-            <img src="logo_promueva.png" alt="Promueva" class="h-8 w-auto" onerror="this.style.display='none'">
-          </div>
-          <div class="text-right">
-            <span class="text-[10px] font-bold text-slate-400 block uppercase">Código de Registro</span>
-            <span class="text-xs font-mono font-extrabold text-udd-blue bg-udd-lightCyan px-2.5 py-1 rounded-lg border border-udd-cyan/30">
-              {{ currentVoucher.codigoTracking }}
-            </span>
-          </div>
-        </div>
-
-        <!-- Mensaje de confirmación -->
-        <div class="bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-2xl p-4 mb-6 flex items-start space-x-3 no-print">
-          <i class="fa-solid fa-circle-check text-emerald-600 text-xl mt-0.5"></i>
-          <div class="text-xs font-medium leading-relaxed">
-            <p class="font-bold text-sm text-emerald-900 mb-1">¡Inscripción recibida con éxito!</p>
-            <p>Estimado(a) <strong>{{ currentVoucher.nombreContacto }}</strong>, confirmamos la recepción de la inscripción de su establecimiento. Pronto nos pondremos en contacto para coordinar los detalles.</p>
-          </div>
-        </div>
-
-        <!-- Resumen de Datos -->
-        <div class="space-y-4 text-xs">
-          
-          <div class="bg-slate-50 p-4 rounded-xl space-y-2 border border-slate-100">
-            <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Establecimiento</div>
-            <div class="flex justify-between"><span class="text-slate-500">Colegio:</span> <span class="font-bold text-udd-navy text-sm">{{ currentVoucher.nombreColegio }}</span></div>
-            <div class="flex justify-between"><span class="text-slate-500">RBD:</span> <span class="font-mono font-bold">{{ currentVoucher.rbd }}</span></div>
-            <div class="flex justify-between"><span class="text-slate-500">Comuna:</span> <span class="font-semibold">{{ currentVoucher.comuna }}</span></div>
-            <div class="flex justify-between"><span class="text-slate-500">Sede UDD:</span> <span class="font-bold text-udd-blue">{{ currentVoucher.sede }}</span></div>
-          </div>
-
-          <div class="bg-slate-50 p-4 rounded-xl space-y-2 border border-slate-100">
-            <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Cursos Inscritos y Fechas</div>
-            <div v-for="c in currentVoucher.cursosResumen" :key="c.nombre" class="flex justify-between items-center border-b border-slate-200/50 pb-1.5 last:border-b-0">
-              <span class="font-bold text-slate-700">{{ c.nombre }}</span>
-              <span class="text-slate-600">Fecha: {{ formatDate(c.fecha) }}</span>
-              <span class="font-mono font-bold bg-white px-2 py-0.5 rounded border text-[11px]">{{ c.alumnos }} estudiantes</span>
-            </div>
-          </div>
-
-          <div class="bg-slate-50 p-4 rounded-xl space-y-2 border border-slate-100">
-            <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Contacto del Colegio</div>
-            <div class="flex justify-between"><span class="text-slate-500">Nombre:</span> <span class="font-semibold">{{ currentVoucher.nombreContacto }}</span></div>
-            <div class="flex justify-between"><span class="text-slate-500">Cargo:</span> <span class="font-semibold">{{ currentVoucher.cargoContacto }}</span></div>
-            <div class="flex justify-between"><span class="text-slate-500">Email:</span> <span>{{ currentVoucher.emailContacto }}</span></div>
-            <div class="flex justify-between"><span class="text-slate-500">Teléfono:</span> <span class="font-mono">{{ currentVoucher.celularContacto }}</span></div>
-          </div>
-
-          <div class="bg-udd-lightCyan/50 p-4 rounded-xl space-y-1 border border-udd-cyan/20">
-            <div class="text-[10px] font-bold text-udd-navy uppercase tracking-wider mb-1">Contacto UDD Asignado</div>
-            <div class="flex justify-between"><span class="text-slate-500">Contacto:</span> <span class="font-bold text-udd-navy">{{ currentVoucher.ejecutivoUDD?.nombre }}</span></div>
-            <div class="flex justify-between"><span class="text-slate-500">Email:</span> <span>{{ currentVoucher.ejecutivoUDD?.email }}</span></div>
-            <div class="flex justify-between"><span class="text-slate-500">Teléfono:</span> <span class="font-mono">{{ currentVoucher.ejecutivoUDD?.celular }}</span></div>
-          </div>
-
-        </div>
-
-        <!-- Acciones del Voucher -->
-        <div class="mt-6 flex justify-end space-x-3 no-print">
-          <button @click="printVoucher" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold px-4 py-2.5 rounded-xl text-xs transition-all flex items-center">
-            <i class="fa-solid fa-print mr-2"></i> Imprimir / Guardar PDF
-          </button>
-          <button @click="closeVoucherModal" class="bg-udd-navy hover:bg-udd-blue text-white font-bold px-5 py-2.5 rounded-xl text-xs transition-all">
-            Cerrar
-          </button>
-        </div>
-
-      </div>
-
-    </div>
 
     <!-- FOOTER INSTITUCIONAL -->
     <footer class="bg-udd-navy text-slate-400 text-xs py-6 border-t border-udd-blue/30 mt-auto no-print">
@@ -568,6 +571,7 @@
 
         const step = ref(1);
         const isSubmitting = ref(false);
+        const submitted = ref(false);
 
         // Lista base por defecto (respaldo si falla la red)
         const ejecutivosLista = ref([
@@ -577,19 +581,19 @@
           { nombre: 'Matías Fuentes', email: 'mfuentes@udd.cl', celular: '+56 9 4433 2211', sede: 'Concepción' }
         ]);
 
-        const selectedExecutiveIndex = ref(0);
+        const selectedExecutiveIndex = ref('');
 
-        // Estructura principal del Formulario
+        // Estructura principal del Formulario (Cursos desmarcados y campos de alumnos vacíos por defecto)
         const form = ref({
           sede: 'Santiago',
           rbd: '',
           nombreColegio: '',
           comuna: '',
           cursos: {
-            'II° Medio': { selected: true, fecha: '', alumnos: 35 },
-            'III° Medio': { selected: true, fecha: '', alumnos: 40 },
-            'IV° Medio': { selected: true, fecha: '', alumnos: 40 },
-            'Egresados': { selected: false, fecha: '', alumnos: 20 }
+            'II° Medio': { selected: false, fecha: '', alumnos: null },
+            'III° Medio': { selected: false, fecha: '', alumnos: null },
+            'IV° Medio': { selected: false, fecha: '', alumnos: null },
+            'Egresados': { selected: false, fecha: '', alumnos: null }
           },
           nombreContacto: '',
           cargoContacto: '',
@@ -600,7 +604,6 @@
 
         const rbdError = ref('');
         const isRBDValid = ref(false);
-        const showVoucherModal = ref(false);
         const currentVoucher = ref({});
 
         // Carga dinámica de ejecutivos desde la pestaña de Google Sheets
@@ -610,10 +613,6 @@
             const json = await res.json();
             if (json.status === 'success' && json.ejecutivos && json.ejecutivos.length > 0) {
               ejecutivosLista.value = json.ejecutivos;
-              if (ejecutivosFiltrados.value.length > 0) {
-                selectedExecutiveIndex.value = 0;
-                form.value.ejecutivoUDD = { ...ejecutivosFiltrados.value[0] };
-              }
             }
           } catch (e) {
             console.warn("Usando lista local de ejecutivos por defecto.");
@@ -653,7 +652,7 @@
 
         // Opción 3 Híbrida: Limpia el error visual inmediatamente al escribir (@input)
         function onRBDInput() {
-          rbdError.value = ''; // Remueve la alerta roja al instante
+          rbdError.value = '';
           if (!form.value.rbd) {
             isRBDValid.value = false;
             return;
@@ -723,7 +722,7 @@
           if (!hasSelectedCourses.value) return false;
           return Object.values(form.value.cursos).every(c => {
             if (!c.selected) return true;
-            return c.fecha && c.alumnos > 0;
+            return c.fecha && c.alumnos && Number(c.alumnos) > 0;
           });
         });
 
@@ -816,7 +815,7 @@
 
           const currentExec = ejecutivosFiltrados.value[selectedExecutiveIndex.value] || {};
 
-          // 1. Objeto para el Modal Web
+          // Objeto Comprobante
           const newRecord = {
             codigoTracking: trackingCode,
             sede: form.value.sede,
@@ -834,7 +833,6 @@
             fechaInscripcion: new Date().toISOString()
           };
 
-          // 2. Payload para Google Apps Script (Columnas independientes + Correo del Ejecutivo)
           const payloadGoogle = {
             codigoRegistro: trackingCode,
             fechaRegistro: new Date().toISOString(),
@@ -867,7 +865,7 @@
               serverCode = resData.codigoRegistro;
             }
           } catch (e) {
-            console.warn("Error recibiendo respuesta de Google Sheets, usando código correlativo local:", e);
+            console.warn("Error recibiendo respuesta de Google Sheets, usando correlativo local:", e);
           }
 
           if (serverCode) {
@@ -879,46 +877,37 @@
           localStorage.setItem('udd_vocacional_registros', JSON.stringify(existing));
 
           currentVoucher.value = newRecord;
-          showVoucherModal.value = true;
           isSubmitting.value = false;
 
-          resetForm();
+          // Transición a la vista de confirmación integrada (inline)
+          submitted.value = true;
+          window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        function resetForm() {
-          const defaultDate = new Date();
-          defaultDate.setDate(defaultDate.getDate() + 14);
-          const defStr = defaultDate.toISOString().split('T')[0];
-
+        function resetFormAndReturn() {
           form.value = {
             sede: 'Santiago',
             rbd: '',
             nombreColegio: '',
             comuna: '',
             cursos: {
-              'II° Medio': { selected: true, fecha: defStr, alumnos: 35 },
-              'III° Medio': { selected: true, fecha: defStr, alumnos: 40 },
-              'IV° Medio': { selected: true, fecha: defStr, alumnos: 40 },
-              'Egresados': { selected: false, fecha: defStr, alumnos: 20 }
+              'II° Medio': { selected: false, fecha: '', alumnos: null },
+              'III° Medio': { selected: false, fecha: '', alumnos: null },
+              'IV° Medio': { selected: false, fecha: '', alumnos: null },
+              'Egresados': { selected: false, fecha: '', alumnos: null }
             },
             nombreContacto: '',
             cargoContacto: '',
             emailContacto: '',
             celularContacto: '',
-            ejecutivoUDD: ejecutivosFiltrados.value[0] || null
+            ejecutivoUDD: null
           };
-          selectedExecutiveIndex.value = 0;
+          selectedExecutiveIndex.value = '';
           rbdError.value = '';
           isRBDValid.value = false;
           step.value = 1;
-        }
-
-        function closeVoucherModal() {
-          showVoucherModal.value = false;
-        }
-
-        function printVoucher() {
-          window.print();
+          submitted.value = false;
+          window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
         function formatDate(dateStr) {
@@ -935,20 +924,12 @@
         });
 
         onMounted(() => {
-          const defaultDate = new Date();
-          defaultDate.setDate(defaultDate.getDate() + 14);
-          const defStr = defaultDate.toISOString().split('T')[0];
-
-          form.value.cursos['II° Medio'].fecha = defStr;
-          form.value.cursos['III° Medio'].fecha = defStr;
-          form.value.cursos['IV° Medio'].fecha = defStr;
-          form.value.cursos['Egresados'].fecha = defStr;
-
           cargarEjecutivosPlanilla();
         });
 
         return {
           step,
+          submitted,
           form,
           rbdError,
           isRBDValid,
@@ -969,10 +950,8 @@
           nextStep,
           submitForm,
           isSubmitting,
-          showVoucherModal,
           currentVoucher,
-          closeVoucherModal,
-          printVoucher,
+          resetFormAndReturn,
           formatDate,
           minDate
         };
