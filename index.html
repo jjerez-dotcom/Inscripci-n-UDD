@@ -37,7 +37,7 @@
         <!-- Contenedor Principal del Formulario -->
         <main class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 md:p-8">
             
-            <!-- Indicador de Pasos -->
+            <!-- Indicador de 3 Pasos + Comprobante -->
             <div v-if="!submitted" class="mb-8">
                 <div class="flex justify-between items-center relative max-w-xl mx-auto">
                     <div class="absolute left-0 top-1/2 -translate-y-1/2 w-full h-1 bg-slate-100 z-0"></div>
@@ -47,77 +47,51 @@
                     <div class="relative z-10 flex flex-col items-center">
                         <div class="w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm transition-colors"
                              :class="step >= 1 ? 'bg-udd text-white' : 'bg-slate-200 text-slate-500'">1</div>
-                        <span class="text-xs font-medium mt-2 text-slate-600">Colegio y Cursos</span>
+                        <span class="text-xs font-medium mt-2 text-slate-600">Establecimiento</span>
                     </div>
 
                     <div class="relative z-10 flex flex-col items-center">
                         <div class="w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm transition-colors"
                              :class="step >= 2 ? 'bg-udd text-white' : 'bg-slate-200 text-slate-500'">2</div>
-                        <span class="text-xs font-medium mt-2 text-slate-600">Contacto y UDD</span>
+                        <span class="text-xs font-medium mt-2 text-slate-600">Cursos y Alumnos</span>
                     </div>
 
                     <div class="relative z-10 flex flex-col items-center">
                         <div class="w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm transition-colors"
                              :class="step >= 3 ? 'bg-udd text-white' : 'bg-slate-200 text-slate-500'">3</div>
-                        <span class="text-xs font-medium mt-2 text-slate-600">Confirmación</span>
+                        <span class="text-xs font-medium mt-2 text-slate-600">Contacto UDD</span>
                     </div>
                 </div>
             </div>
 
-            <!-- PASO 1: DATOS COLEGIO Y CURSOS -->
+            <!-- PASO 1: DATOS COLEGIO -->
             <div v-if="step === 1 && !submitted">
                 <h2 class="text-lg font-bold text-slate-800 mb-4 pb-2 border-b border-slate-100">1. Identificación del Establecimiento</h2>
                 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                     <div>
                         <label class="block text-sm font-semibold text-slate-700 mb-1">Sede UDD *</label>
-                        <select id="field-sede" v-model="form.sede" @change="onSedeChange" class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                        <select id="field-sede" v-model="form.sede" @change="clearError('sede'); onSedeChange()" class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
                             <option value="Santiago">Santiago</option>
                             <option value="Concepción">Concepción</option>
                         </select>
                     </div>
                     <div>
                         <label class="block text-sm font-semibold text-slate-700 mb-1">RBD del Colegio *</label>
-                        <input id="field-rbd" type="text" v-model="form.rbd" placeholder="Ej: 8833-1" class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none" :class="{'border-red-500 bg-red-50': errors.rbd}">
+                        <input id="field-rbd" type="text" v-model="form.rbd" @input="clearError('rbd')" @blur="validateRBDOnBlur" placeholder="Ej: 8833-1" class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none" :class="{'border-red-500 bg-red-50': errors.rbd}">
                         <p v-if="errors.rbd" class="text-xs text-red-600 font-medium mt-1">{{ errors.rbd }}</p>
                     </div>
                     <div>
                         <label class="block text-sm font-semibold text-slate-700 mb-1">Nombre del Colegio *</label>
-                        <input id="field-nombreColegio" type="text" v-model="form.nombreColegio" placeholder="Nombre oficial" class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none" :class="{'border-red-500 bg-red-50': errors.nombreColegio}">
+                        <input id="field-nombreColegio" type="text" v-model="form.nombreColegio" @input="clearError('nombreColegio')" placeholder="Nombre oficial del establecimiento" class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none" :class="{'border-red-500 bg-red-50': errors.nombreColegio}">
                         <p v-if="errors.nombreColegio" class="text-xs text-red-600 font-medium mt-1">{{ errors.nombreColegio }}</p>
                     </div>
                     <div>
                         <label class="block text-sm font-semibold text-slate-700 mb-1">Comuna *</label>
-                        <input id="field-comuna" type="text" v-model="form.comuna" placeholder="Comuna del establecimiento" class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none" :class="{'border-red-500 bg-red-50': errors.comuna}">
+                        <input id="field-comuna" type="text" v-model="form.comuna" @input="clearError('comuna')" placeholder="Comuna del establecimiento" class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none" :class="{'border-red-500 bg-red-50': errors.comuna}">
                         <p v-if="errors.comuna" class="text-xs text-red-600 font-medium mt-1">{{ errors.comuna }}</p>
                     </div>
                 </div>
-
-                <h2 class="text-lg font-bold text-slate-800 mb-4 pb-2 border-b border-slate-100">2. Cursos a Participar</h2>
-                <p class="text-sm text-slate-500 mb-4">Seleccione los niveles, indique la fecha estimada y la cantidad aproximada de alumnos.</p>
-
-                <div id="field-cursos" class="space-y-3 mb-2">
-                    <div v-for="(curso, key) in form.cursos" :key="key" class="p-4 border rounded-xl transition-all" :class="curso.selected ? 'border-blue-300 bg-blue-50/30' : errors.cursos ? 'border-red-300 bg-red-50/20' : 'border-slate-200 bg-slate-50/50'">
-                        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                            <label class="flex items-center gap-3 font-semibold text-slate-800 cursor-pointer">
-                                <input type="checkbox" v-model="curso.selected" class="w-5 h-5 text-blue-600 rounded focus:ring-blue-500">
-                                {{ key }}
-                            </label>
-                            
-                            <div v-if="curso.selected" class="grid grid-cols-1 sm:grid-cols-2 gap-3 w-full sm:w-auto">
-                                <div>
-                                    <label class="block text-xs font-medium text-slate-500 mb-1">Fecha Preferente</label>
-                                    <input type="date" v-model="curso.fecha" class="p-2 bg-white border border-slate-300 rounded-lg text-sm focus:outline-none focus:border-blue-500">
-                                </div>
-                                <div>
-                                    <label class="block text-xs font-medium text-slate-500 mb-1">N° Alumnos</label>
-                                    <input type="number" min="1" v-model="curso.alumnos" class="p-2 bg-white border border-slate-300 rounded-lg text-sm w-full sm:w-28 focus:outline-none focus:border-blue-500">
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <p v-if="errors.cursos" class="text-xs text-red-600 font-medium mb-4">{{ errors.cursos }}</p>
 
                 <div class="flex justify-end pt-4">
                     <button @click="nextStep1" class="bg-udd text-white px-6 py-2.5 rounded-lg font-semibold hover:bg-slate-800 transition-colors shadow-sm">
@@ -126,30 +100,68 @@
                 </div>
             </div>
 
-            <!-- PASO 2: DATOS DE CONTACTO Y EJECUTIVO -->
+            <!-- PASO 2: CURSOS Y CANTIDAD DE ALUMNOS -->
             <div v-if="step === 2 && !submitted">
+                <h2 class="text-lg font-bold text-slate-800 mb-2">2. Cursos a Participar y Fechas</h2>
+                <p class="text-sm text-slate-500 mb-4 pb-2 border-b border-slate-100">Seleccione los niveles, indique la fecha estimada (la fecha de II° Medio se propagará automáticamente) y la cantidad aproximada de alumnos.</p>
+
+                <div id="field-cursos" class="space-y-3 mb-4">
+                    <div v-for="(curso, key) in form.cursos" :key="key" class="p-4 border rounded-xl transition-all" :class="curso.selected ? 'border-blue-300 bg-blue-50/30' : errors.cursos ? 'border-red-300 bg-red-50/20' : 'border-slate-200 bg-slate-50/50'">
+                        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                            <label class="flex items-center gap-3 font-semibold text-slate-800 cursor-pointer">
+                                <input type="checkbox" v-model="curso.selected" @change="clearError('cursos')" class="w-5 h-5 text-blue-600 rounded focus:ring-blue-500">
+                                {{ key }}
+                            </label>
+                            
+                            <div v-if="curso.selected" class="grid grid-cols-1 sm:grid-cols-2 gap-3 w-full sm:w-auto">
+                                <div>
+                                    <label class="block text-xs font-medium text-slate-500 mb-1">Fecha Preferente</label>
+                                    <input type="date" v-model="curso.fecha" @change="key === 'II° Medio' ? onFechaIIMedioChange() : null" class="p-2 bg-white border border-slate-300 rounded-lg text-sm focus:outline-none focus:border-blue-500">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-medium text-slate-500 mb-1">N° Alumnos</label>
+                                    <input type="number" min="1" v-model.number="curso.alumnos" placeholder="Cantidad" class="p-2 bg-white border border-slate-300 rounded-lg text-sm w-full sm:w-28 focus:outline-none focus:border-blue-500">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <p v-if="errors.cursos" class="text-xs text-red-600 font-medium mb-4">{{ errors.cursos }}</p>
+
+                <div class="flex justify-between items-center pt-4 border-t border-slate-100">
+                    <button @click="step = 1" class="text-slate-600 px-4 py-2 font-medium hover:text-slate-900">
+                        &larr; Volver
+                    </button>
+                    <button @click="nextStep2" class="bg-udd text-white px-6 py-2.5 rounded-lg font-semibold hover:bg-slate-800 transition-colors shadow-sm">
+                        Siguiente &rarr;
+                    </button>
+                </div>
+            </div>
+
+            <!-- PASO 3: DATOS DE CONTACTO Y CONTACTO UDD -->
+            <div v-if="step === 3 && !submitted">
                 <h2 class="text-lg font-bold text-slate-800 mb-1">3. Datos del Contacto en el Colegio</h2>
-                <p class="text-sm text-slate-500 mb-4 pb-2 border-b border-slate-100">Ingrese los datos de la persona de contacto en el establecimiento y seleccione su contacto de la UDD.</p>
+                <p class="text-sm text-slate-500 mb-4 pb-2 border-b border-slate-100">Ingrese los datos de la persona de contacto en el colegio y seleccione su Contacto UDD.</p>
                 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                     <div>
                         <label class="block text-sm font-semibold text-slate-700 mb-1">Nombre Completo *</label>
-                        <input id="field-contactoNombre" type="text" v-model="form.contactoNombre" placeholder="Nombre y Apellido" class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none" :class="{'border-red-500 bg-red-50': errors.contactoNombre}">
+                        <input id="field-contactoNombre" type="text" v-model="form.contactoNombre" @input="clearError('contactoNombre')" placeholder="Nombre y Apellido" class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none" :class="{'border-red-500 bg-red-50': errors.contactoNombre}">
                         <p v-if="errors.contactoNombre" class="text-xs text-red-600 font-medium mt-1">{{ errors.contactoNombre }}</p>
                     </div>
                     <div>
                         <label class="block text-sm font-semibold text-slate-700 mb-1">Cargo *</label>
-                        <input id="field-contactoCargo" type="text" v-model="form.contactoCargo" placeholder="Ej: Orientador / Director" class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none" :class="{'border-red-500 bg-red-50': errors.contactoCargo}">
+                        <input id="field-contactoCargo" type="text" v-model="form.contactoCargo" @input="clearError('contactoCargo')" placeholder="Ej: Orientador / Director" class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none" :class="{'border-red-500 bg-red-50': errors.contactoCargo}">
                         <p v-if="errors.contactoCargo" class="text-xs text-red-600 font-medium mt-1">{{ errors.contactoCargo }}</p>
                     </div>
                     <div>
                         <label class="block text-sm font-semibold text-slate-700 mb-1">Correo Electrónico *</label>
-                        <input id="field-contactoEmail" type="email" v-model="form.contactoEmail" placeholder="correo@colegio.cl" class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none" :class="{'border-red-500 bg-red-50': errors.contactoEmail}">
+                        <input id="field-contactoEmail" type="email" v-model="form.contactoEmail" @input="clearError('contactoEmail')" placeholder="correo@colegio.cl" class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none" :class="{'border-red-500 bg-red-50': errors.contactoEmail}">
                         <p v-if="errors.contactoEmail" class="text-xs text-red-600 font-medium mt-1">{{ errors.contactoEmail }}</p>
                     </div>
                     <div>
                         <label class="block text-sm font-semibold text-slate-700 mb-1">Teléfono / Celular *</label>
-                        <input id="field-contactoCelular" type="tel" v-model="form.contactoCelular" placeholder="+56 9 1234 5678" class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none" :class="{'border-red-500 bg-red-50': errors.contactoCelular}">
+                        <input id="field-contactoCelular" type="tel" v-model="form.contactoCelular" @input="clearError('contactoCelular')" placeholder="+56 9 1234 5678" class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none" :class="{'border-red-500 bg-red-50': errors.contactoCelular}">
                         <p v-if="errors.contactoCelular" class="text-xs text-red-600 font-medium mt-1">{{ errors.contactoCelular }}</p>
                     </div>
                 </div>
@@ -157,7 +169,7 @@
                 <h2 class="text-lg font-bold text-slate-800 mb-4 pb-2 border-b border-slate-100">4. Contacto UDD</h2>
                 <div class="mb-6">
                     <label class="block text-sm font-semibold text-slate-700 mb-1">Seleccione Contacto UDD *</label>
-                    <select id="field-ejecutivo" v-model="form.ejecutivo" class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none" :class="{'border-red-500 bg-red-50': errors.ejecutivo}">
+                    <select id="field-ejecutivo" v-model="form.ejecutivo" @change="clearError('ejecutivo')" class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none" :class="{'border-red-500 bg-red-50': errors.ejecutivo}">
                         <option :value="null">-- Seleccione Contacto UDD --</option>
                         <option v-for="ej in ejecutivosFiltrados" :key="ej.email" :value="ej">
                             {{ ej.nombre }} ({{ ej.email }})
@@ -167,7 +179,7 @@
                 </div>
 
                 <div class="flex justify-between items-center pt-4 border-t border-slate-100">
-                    <button @click="step = 1" class="text-slate-600 px-4 py-2 font-medium hover:text-slate-900">
+                    <button @click="step = 2" class="text-slate-600 px-4 py-2 font-medium hover:text-slate-900">
                         &larr; Volver
                     </button>
                     <button @click="handleSubmit" :disabled="isSubmitting" class="bg-udd text-white px-8 py-3 rounded-lg font-bold hover:bg-slate-800 transition-colors shadow-md flex items-center gap-2">
@@ -177,7 +189,7 @@
                 </div>
             </div>
 
-            <!-- PASO 3: COMPROBANTE DE ÉXITO -->
+            <!-- PASO 4 / COMPROBANTE DE ÉXITO -->
             <div v-if="submitted && currentVoucher">
                 <div class="bg-emerald-50 border border-emerald-200 rounded-xl p-4 mb-6 flex items-center gap-3">
                     <div class="w-8 h-8 rounded-full bg-emerald-500 text-white flex items-center justify-center font-bold text-lg flex-shrink-0">✓</div>
@@ -258,14 +270,12 @@
 
         createApp({
             data() {
-                const hoyStr = new Date().toISOString().split('T')[0];
                 return {
                     step: 1,
                     isSubmitting: false,
                     submitted: false,
                     errors: {},
                     currentVoucher: null,
-                    // Lista por defecto de respaldo (se sobreescribe automáticamente desde Google Sheets)
                     ejecutivos: [
                         { nombre: 'Valentina Rojas', email: 'vrojas@udd.cl', celular: '+56 9 8765 4321', sede: 'Santiago' },
                         { nombre: 'Gonzalo Morales', email: 'gmorales@udd.cl', celular: '+56 9 7112 3344', sede: 'Santiago' },
@@ -278,10 +288,10 @@
                         nombreColegio: '',
                         comuna: '',
                         cursos: {
-                            'II° Medio': { selected: true, fecha: hoyStr, alumnos: 40 },
-                            'III° Medio': { selected: true, fecha: hoyStr, alumnos: 40 },
-                            'IV° Medio': { selected: true, fecha: hoyStr, alumnos: 40 },
-                            'Egresados': { selected: false, fecha: hoyStr, alumnos: 20 }
+                            'II° Medio': { selected: false, fecha: '', alumnos: null },
+                            'III° Medio': { selected: false, fecha: '', alumnos: null },
+                            'IV° Medio': { selected: false, fecha: '', alumnos: null },
+                            'Egresados': { selected: false, fecha: '', alumnos: null }
                         },
                         contactoNombre: '',
                         contactoCargo: '',
@@ -300,6 +310,12 @@
                 this.loadEjecutivosFromSheet();
             },
             methods: {
+                // Limpieza instantánea de errores al escribir o cambiar un campo (Opción 3)
+                clearError(field) {
+                    if (this.errors[field]) {
+                        delete this.errors[field];
+                    }
+                },
                 // Cargar dinámicamente ejecutivos activos desde Google Sheets
                 async loadEjecutivosFromSheet() {
                     try {
@@ -338,10 +354,31 @@
 
                     return dv === dvEsperado;
                 },
+                // Validación específica de RBD al salir del campo (@blur)
+                validateRBDOnBlur() {
+                    if (!this.form.rbd) {
+                        this.errors.rbd = 'Ingrese el RBD del colegio.';
+                    } else if (!this.validarRBD(this.form.rbd)) {
+                        this.errors.rbd = 'El RBD o dígito verificador no es válido (Ej: 8833-1).';
+                    } else {
+                        delete this.errors.rbd;
+                    }
+                },
+                // Replicación automática de fechas desde II° Medio al resto de cursos
+                onFechaIIMedioChange() {
+                    const fechaII = this.form.cursos['II° Medio'].fecha;
+                    if (fechaII) {
+                        ['III° Medio', 'IV° Medio', 'Egresados'].forEach(k => {
+                            if (this.form.cursos[k]) {
+                                this.form.cursos[k].fecha = fechaII;
+                            }
+                        });
+                    }
+                },
                 onSedeChange() {
                     this.form.ejecutivo = null;
                 },
-                // Enfocar y desplazar la pantalla al primer campo con error
+                // Enfocar y desplazar al primer campo con error
                 focusFirstError() {
                     this.$nextTick(() => {
                         const errField = document.querySelector('.border-red-500');
@@ -365,14 +402,35 @@
                     if (!this.form.nombreColegio) this.errors.nombreColegio = 'Ingrese el nombre del colegio.';
                     if (!this.form.comuna) this.errors.comuna = 'Ingrese la comuna.';
 
-                    let algunCurso = false;
-                    for (let k in this.form.cursos) {
-                        if (this.form.cursos[k].selected) algunCurso = true;
-                    }
-                    if (!algunCurso) this.errors.cursos = 'Seleccione al menos un curso a participar.';
-
                     if (Object.keys(this.errors).length === 0) {
                         this.step = 2;
+                    } else {
+                        this.focusFirstError();
+                    }
+                },
+                nextStep2() {
+                    this.errors = {};
+                    let algunCurso = false;
+                    let faltaDetalle = false;
+
+                    for (let key in this.form.cursos) {
+                        let c = this.form.cursos[key];
+                        if (c.selected) {
+                            algunCurso = true;
+                            if (!c.fecha || !c.alumnos || c.alumnos <= 0) {
+                                faltaDetalle = true;
+                            }
+                        }
+                    }
+
+                    if (!algunCurso) {
+                        this.errors.cursos = 'Seleccione al menos un curso a participar.';
+                    } else if (faltaDetalle) {
+                        this.errors.cursos = 'Ingrese la fecha preferente y la cantidad de alumnos para todos los cursos seleccionados.';
+                    }
+
+                    if (Object.keys(this.errors).length === 0) {
+                        this.step = 3;
                     } else {
                         this.focusFirstError();
                     }
@@ -389,7 +447,7 @@
                     if (!this.form.contactoCargo) this.errors.contactoCargo = 'Ingrese el cargo del contacto.';
                     if (!this.form.contactoEmail) this.errors.contactoEmail = 'Ingrese un email válido.';
                     if (!this.form.contactoCelular) this.errors.contactoCelular = 'Ingrese número telefónico.';
-                    if (!this.form.ejecutivo) this.errors.ejecutivo = 'Seleccione un contacto UDD.';
+                    if (!this.form.ejecutivo) this.errors.ejecutivo = 'Seleccione un Contacto UDD.';
 
                     if (Object.keys(this.errors).length > 0) {
                         this.focusFirstError();
@@ -398,12 +456,10 @@
 
                     this.isSubmitting = true;
 
-                    // Extraer datos del Ejecutivo
                     let ejecObj = this.form.ejecutivo;
                     let nombreEjecutivoTexto = typeof ejecObj === 'object' && ejecObj !== null ? (ejecObj.nombre || "") : String(ejecObj || "");
                     let emailEjecutivoTexto = typeof ejecObj === 'object' && ejecObj !== null ? (ejecObj.email || "") : "";
 
-                    // Procesar Cursos para la vista y para la planilla (columnas separadas)
                     let cursosListaVoucher = [];
                     let totalEst = 0;
 
@@ -435,7 +491,6 @@
                         }
                     }
 
-                    // Objeto enviado a Google Apps Script
                     const payloadGoogle = {
                         sede: this.form.sede || '',
                         rbd: this.form.rbd || '',
@@ -468,17 +523,15 @@
                             codigoGeneradoServidor = resData.codigoRegistro;
                         }
                     } catch (e) {
-                        console.warn("Error conectando con Google Sheets, asignando código local temporal:", e);
+                        console.warn("Error conectando con Google Sheets, asignando código de respaldo:", e);
                     }
 
-                    // Fallback visual en caso de falla extrema de red
                     if (!codigoGeneradoServidor) {
                         const ano = new Date().getFullYear();
                         const siglaSede = this.form.sede === 'Santiago' ? 'SCL' : 'CCP';
                         codigoGeneradoServidor = `${ano}-${siglaSede}-${this.form.rbd}-001`;
                     }
 
-                    // Voucher visual final para el colegio
                     this.currentVoucher = {
                         codigoTracking: codigoGeneradoServidor,
                         fechaRegistro: new Date().toISOString(),
@@ -495,7 +548,6 @@
                         ejecutivoUDD: ejecObj
                     };
 
-                    // Guardar respaldo local en navegador
                     let exist = JSON.parse(localStorage.getItem('udd_vocacional_registros') || '[]');
                     exist.unshift(this.currentVoucher);
                     localStorage.setItem('udd_vocacional_registros', JSON.stringify(exist));
@@ -507,20 +559,20 @@
                     }, 400);
                 },
                 resetForm() {
-                    const hoyStr = new Date().toISOString().split('T')[0];
                     this.step = 1;
                     this.submitted = false;
                     this.currentVoucher = null;
+                    this.errors = {};
                     this.form = {
                         sede: 'Santiago',
                         rbd: '',
                         nombreColegio: '',
                         comuna: '',
                         cursos: {
-                            'II° Medio': { selected: true, fecha: hoyStr, alumnos: 40 },
-                            'III° Medio': { selected: true, fecha: hoyStr, alumnos: 40 },
-                            'IV° Medio': { selected: true, fecha: hoyStr, alumnos: 40 },
-                            'Egresados': { selected: false, fecha: hoyStr, alumnos: 20 }
+                            'II° Medio': { selected: false, fecha: '', alumnos: null },
+                            'III° Medio': { selected: false, fecha: '', alumnos: null },
+                            'IV° Medio': { selected: false, fecha: '', alumnos: null },
+                            'Egresados': { selected: false, fecha: '', alumnos: null }
                         },
                         contactoNombre: '',
                         contactoCargo: '',
