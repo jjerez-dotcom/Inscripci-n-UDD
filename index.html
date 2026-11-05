@@ -75,22 +75,21 @@
     <!-- CABECERA PRINCIPAL CON LOGOS OFICIALES -->
     <header class="bg-white text-slate-900 shadow-md border-b-4 border-udd-cyan sticky top-0 z-30 no-print">
       <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex items-center justify-between py-4 h-24">
+        <div class="flex items-center justify-between py-4 h-20 sm:h-24">
           
           <!-- LOGO UDD -->
           <div class="flex items-center">
             <img 
               src="logo_udd.png" 
               alt="Universidad del Desarrollo" 
-              class="h-12 sm:h-16 w-auto object-contain"
-              onerror="this.onerror=null; this.src='https://placehold.co/220x70/002B49/ffffff?text=UDD';"
+              class="h-9 sm:h-11 w-auto object-contain"
+              onerror="this.onerror=null; this.src='https://placehold.co/180x55/002B49/ffffff?text=UDD';"
             />
           </div>
 
           <!-- TÍTULO CENTRAL INSTITUCIONAL -->
           <div class="text-center hidden sm:block px-4">
-            <h1 class="text-base sm:text-lg font-extrabold text-udd-navy tracking-tight">Test de Orientación Vocacional UDD 2026</h1>
-            <p class="text-[11px] font-semibold text-slate-500">Universidad del Desarrollo &amp; Fundación Promueva</p>
+            <h1 class="text-base sm:text-xl font-extrabold text-udd-navy tracking-tight">Test de Orientación Vocacional UDD 2026</h1>
           </div>
 
           <!-- LOGO FUNDACIÓN PROMUEVA -->
@@ -98,8 +97,8 @@
             <img 
               src="logo_promueva.png" 
               alt="Fundación Promueva" 
-              class="h-12 sm:h-16 w-auto object-contain"
-              onerror="this.onerror=null; this.src='https://placehold.co/220x70/ffffff/334155?text=Fundación+Promueva';"
+              class="h-9 sm:h-11 w-auto object-contain"
+              onerror="this.onerror=null; this.src='https://placehold.co/180x55/ffffff/334155?text=Fundación+Promueva';"
             />
           </div>
 
@@ -170,7 +169,7 @@
           </div>
 
           <div class="bg-udd-lightCyan/50 p-4 rounded-xl space-y-1 border border-udd-cyan/20 md:col-span-2">
-            <div class="text-[10px] font-bold text-udd-navy uppercase tracking-wider mb-1">Contacto UDD Asignado</div>
+            <div class="text-[10px] font-bold text-udd-navy uppercase tracking-wider mb-1">Contacto UDD</div>
             <div class="flex justify-between"><span class="text-slate-500">Contacto:</span> <span class="font-bold text-udd-navy">{{ currentVoucher.ejecutivoUDD?.nombre }}</span></div>
             <div class="flex justify-between"><span class="text-slate-500">Email:</span> <span>{{ currentVoucher.ejecutivoUDD?.email }}</span></div>
             <div class="flex justify-between"><span class="text-slate-500">Teléfono:</span> <span class="font-mono">{{ currentVoucher.ejecutivoUDD?.celular }}</span></div>
@@ -190,9 +189,9 @@
       <!-- VISTA 2: FORMULARIO PRINCIPAL INTEGRADO CON STEPPER EN EL TOPE -->
       <div v-else class="bg-white rounded-2xl shadow-xl border border-slate-200/80 overflow-hidden">
         
-        <!-- STEPPER INTEGRADO EN EL TOPE (OPCIÓN 2: BARRA EN EL TOPE + PASOS FLOTANTES) -->
+        <!-- STEPPER INTEGRADO EN EL TOPE -->
         <div class="bg-slate-50/70 border-b border-slate-200/80 p-6">
-          <!-- Barra de Progreso Top (Opción 2) -->
+          <!-- Barra de Progreso Top -->
           <div class="overflow-hidden h-1.5 mb-5 text-xs flex rounded-full bg-slate-200">
             <div 
               class="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-udd-cyan transition-all duration-300"
@@ -243,7 +242,7 @@
         </div>
 
         <div class="p-6 sm:p-8">
-          <form @submit.prevent="submitForm">
+          <form novalidate @submit.prevent="submitForm">
 
             <!-- PASO 1: INSCRIPCIÓN COLEGIO -->
             <div v-show="step === 1" class="space-y-6">
@@ -289,14 +288,16 @@
                     @input="onRBDInput"
                     @blur="validateRBDOnBlur"
                     placeholder="Ej: 8833-1" 
-                    required
                     :class="[
-                      rbdError ? 'border-red-400 bg-red-50 focus:ring-red-400' : 'border-slate-200 focus:ring-udd-cyan',
+                      errors.rbd || rbdError ? 'border-red-500 bg-red-50 ring-2 ring-red-200 focus:ring-red-400' : 'border-slate-200 focus:ring-udd-cyan',
                       'w-full px-4 py-3 bg-slate-50 border rounded-xl text-sm focus:bg-white focus:outline-none focus:ring-2 font-mono font-bold transition-all'
                     ]">
                   
                   <span v-if="rbdError" class="text-xs text-red-600 font-semibold mt-1 block">
                     <i class="fa-solid fa-triangle-exclamation mr-1"></i> {{ rbdError }}
+                  </span>
+                  <span v-else-if="errors.rbd" class="text-xs text-red-600 font-semibold mt-1 block">
+                    <i class="fa-solid fa-circle-exclamation mr-1"></i> Este campo es obligatorio.
                   </span>
                   <span v-else-if="form.rbd && isRBDValid" class="text-xs text-emerald-600 font-semibold mt-1 block">
                     <i class="fa-solid fa-circle-check mr-1"></i> RBD Válido
@@ -312,9 +313,15 @@
                   <input 
                     type="text" 
                     v-model="form.nombreColegio" 
-                    required
+                    @input="clearError('nombreColegio')"
                     placeholder="Ingrese el nombre completo del colegio" 
-                    class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-udd-cyan transition-all">
+                    :class="[
+                      errors.nombreColegio ? 'border-red-500 bg-red-50 ring-2 ring-red-200 focus:ring-red-400' : 'border-slate-200 focus:ring-udd-cyan',
+                      'w-full px-4 py-3 bg-slate-50 border rounded-xl text-sm focus:bg-white focus:outline-none focus:ring-2 transition-all'
+                    ]">
+                  <span v-if="errors.nombreColegio" class="text-xs text-red-600 font-semibold mt-1 block">
+                    <i class="fa-solid fa-circle-exclamation mr-1"></i> Por favor ingrese el nombre del colegio.
+                  </span>
                 </div>
               </div>
 
@@ -326,9 +333,15 @@
                 <input 
                   type="text" 
                   v-model="form.comuna" 
-                  required
+                  @input="clearError('comuna')"
                   placeholder="Escriba la comuna correspondiente" 
-                  class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-udd-cyan transition-all">
+                  :class="[
+                    errors.comuna ? 'border-red-500 bg-red-50 ring-2 ring-red-200 focus:ring-red-400' : 'border-slate-200 focus:ring-udd-cyan',
+                    'w-full px-4 py-3 bg-slate-50 border rounded-xl text-sm focus:bg-white focus:outline-none focus:ring-2 transition-all'
+                  ]">
+                <span v-if="errors.comuna" class="text-xs text-red-600 font-semibold mt-1 block">
+                  <i class="fa-solid fa-circle-exclamation mr-1"></i> Por favor ingrese la comuna.
+                </span>
               </div>
 
               <!-- Botón Paso 1: "Siguiente" -->
@@ -353,13 +366,25 @@
                 <p class="text-xs text-slate-500 mt-1">Seleccione los niveles a evaluar. La fecha del primer curso seleccionado se copiará a los demás.</p>
               </div>
 
+              <!-- ALERTA SI NO HAY CURSOS SELECCIONADOS O FALTAN FECHAS -->
+              <div v-if="step2GlobalError" class="p-4 bg-red-50 border border-red-300 rounded-xl text-red-800 text-xs flex items-start space-x-2">
+                <i class="fa-solid fa-triangle-exclamation text-red-600 text-base mt-0.5"></i>
+                <div>
+                  <p class="font-bold">Atención:</p>
+                  <p>{{ step2GlobalError }}</p>
+                </div>
+              </div>
+
               <!-- Lista de Cursos -->
               <div class="space-y-4">
                 <div 
                   v-for="(cData, cName) in form.cursos" 
                   :key="cName"
-                  :class="cData.selected ? 'border-udd-cyan bg-udd-lightCyan/40 ring-1 ring-udd-cyan/30' : 'border-slate-200 bg-slate-50'"
-                  class="p-4 rounded-xl border transition-all">
+                  :class="[
+                    (courseErrors[cName]?.fecha || courseErrors[cName]?.alumnos) ? 'border-red-400 bg-red-50/50 ring-2 ring-red-200' : 
+                    cData.selected ? 'border-udd-cyan bg-udd-lightCyan/40 ring-1 ring-udd-cyan/30' : 'border-slate-200 bg-slate-50',
+                    'p-4 rounded-xl border transition-all'
+                  ]">
                   
                   <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
                     
@@ -373,33 +398,38 @@
                       <span class="ml-3 font-extrabold text-slate-800 text-base">{{ cName }}</span>
                     </label>
 
-                    <!-- Inputs Fecha y Alumnos Acortados (max-w-[170px]) -->
+                    <!-- Inputs Fecha y Alumnos Acortados -->
                     <div v-if="cData.selected" class="flex flex-wrap sm:flex-nowrap items-center gap-3">
                       <div>
                         <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-600 mb-1">
-                          Fecha aplicación
+                          Fecha aplicación <span class="text-red-500">*</span>
                         </label>
                         <input 
                           type="date" 
                           v-model="cData.fecha"
-                          @input="onDateInput(cName)"
+                          @input="onCourseDateInput(cName)"
                           :min="minDate"
-                          required
-                          class="w-full max-w-[170px] px-3 py-2 bg-white border border-slate-200 rounded-lg text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-udd-cyan">
+                          :class="[
+                            courseErrors[cName]?.fecha ? 'border-red-500 bg-red-50 ring-2 ring-red-200 focus:ring-red-400' : 'border-slate-200 focus:ring-udd-cyan',
+                            'w-full max-w-[170px] px-3 py-2 bg-white border rounded-lg text-xs font-semibold focus:outline-none focus:ring-2 transition-all'
+                          ]">
                       </div>
 
                       <div>
                         <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-600 mb-1">
-                          Estudiantes approx.
+                          Estudiantes approx. <span class="text-red-500">*</span>
                         </label>
                         <input 
                           type="number" 
                           v-model="cData.alumnos" 
+                          @input="clearCourseError(cName, 'alumnos')"
                           min="1" 
                           max="1000"
-                          required
                           placeholder="Cantidad"
-                          class="w-full max-w-[130px] px-3 py-2 bg-white border border-slate-200 rounded-lg text-xs font-mono font-bold focus:outline-none focus:ring-2 focus:ring-udd-cyan">
+                          :class="[
+                            courseErrors[cName]?.alumnos ? 'border-red-500 bg-red-50 ring-2 ring-red-200 focus:ring-red-400' : 'border-slate-200 focus:ring-udd-cyan',
+                            'w-full max-w-[130px] px-3 py-2 bg-white border rounded-lg text-xs font-mono font-bold focus:outline-none focus:ring-2 transition-all'
+                          ]">
                       </div>
                     </div>
 
@@ -409,11 +439,6 @@
 
                   </div>
                 </div>
-              </div>
-
-              <div v-if="!hasSelectedCourses" class="p-3 bg-amber-50 border border-amber-200 rounded-xl text-amber-800 text-xs flex items-center">
-                <i class="fa-solid fa-circle-info text-amber-600 mr-2 text-base"></i>
-                Debe seleccionar al menos un curso para avanzar.
               </div>
 
               <!-- Botones Paso 2: "Siguiente" -->
@@ -455,9 +480,15 @@
                   <input 
                     type="text" 
                     v-model="form.nombreContacto" 
-                    required
+                    @input="clearError('nombreContacto')"
                     placeholder="Ej: María José Fernández" 
-                    class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-udd-cyan transition-all">
+                    :class="[
+                      errors.nombreContacto ? 'border-red-500 bg-red-50 ring-2 ring-red-200 focus:ring-red-400' : 'border-slate-200 focus:ring-udd-cyan',
+                      'w-full px-4 py-3 bg-slate-50 border rounded-xl text-sm focus:bg-white focus:outline-none focus:ring-2 transition-all'
+                    ]">
+                  <span v-if="errors.nombreContacto" class="text-xs text-red-600 font-semibold mt-1 block">
+                    <i class="fa-solid fa-circle-exclamation mr-1"></i> Por favor ingrese el nombre del contacto.
+                  </span>
                 </div>
 
                 <!-- CARGO CONTACTO -->
@@ -468,9 +499,15 @@
                   <input 
                     type="text" 
                     v-model="form.cargoContacto" 
-                    required
+                    @input="clearError('cargoContacto')"
                     placeholder="Ej: Orientadora / Directora" 
-                    class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-udd-cyan transition-all">
+                    :class="[
+                      errors.cargoContacto ? 'border-red-500 bg-red-50 ring-2 ring-red-200 focus:ring-red-400' : 'border-slate-200 focus:ring-udd-cyan',
+                      'w-full px-4 py-3 bg-slate-50 border rounded-xl text-sm focus:bg-white focus:outline-none focus:ring-2 transition-all'
+                    ]">
+                  <span v-if="errors.cargoContacto" class="text-xs text-red-600 font-semibold mt-1 block">
+                    <i class="fa-solid fa-circle-exclamation mr-1"></i> Por favor ingrese el cargo del contacto.
+                  </span>
                 </div>
 
                 <!-- EMAIL CONTACTO -->
@@ -481,9 +518,15 @@
                   <input 
                     type="email" 
                     v-model="form.emailContacto" 
-                    required
+                    @input="clearError('emailContacto')"
                     placeholder="correo@colegio.cl" 
-                    class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-udd-cyan transition-all">
+                    :class="[
+                      errors.emailContacto ? 'border-red-500 bg-red-50 ring-2 ring-red-200 focus:ring-red-400' : 'border-slate-200 focus:ring-udd-cyan',
+                      'w-full px-4 py-3 bg-slate-50 border rounded-xl text-sm focus:bg-white focus:outline-none focus:ring-2 transition-all'
+                    ]">
+                  <span v-if="errors.emailContacto" class="text-xs text-red-600 font-semibold mt-1 block">
+                    <i class="fa-solid fa-circle-exclamation mr-1"></i> Por favor ingrese un correo válido.
+                  </span>
                 </div>
 
                 <!-- CELULAR CONTACTO -->
@@ -494,13 +537,19 @@
                   <input 
                     type="tel" 
                     v-model="form.celularContacto" 
-                    required
+                    @input="clearError('celularContacto')"
                     placeholder="+56 9 1234 5678" 
-                    class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-udd-cyan transition-all">
+                    :class="[
+                      errors.celularContacto ? 'border-red-500 bg-red-50 ring-2 ring-red-200 focus:ring-red-400' : 'border-slate-200 focus:ring-udd-cyan',
+                      'w-full px-4 py-3 bg-slate-50 border rounded-xl text-sm focus:bg-white focus:outline-none focus:ring-2 transition-all'
+                    ]">
+                  <span v-if="errors.celularContacto" class="text-xs text-red-600 font-semibold mt-1 block">
+                    <i class="fa-solid fa-circle-exclamation mr-1"></i> Por favor ingrese el teléfono de contacto.
+                  </span>
                 </div>
               </div>
 
-              <!-- CONTACTO UDD (DESPLEGABLE DINÁMICO SANITIZADO) -->
+              <!-- CONTACTO UDD -->
               <div class="bg-udd-lightCyan/60 p-5 rounded-2xl border border-udd-cyan/20 space-y-4">
                 <div>
                   <label class="block text-xs font-bold uppercase tracking-wider text-udd-navy mb-1">
@@ -509,13 +558,18 @@
                   <select 
                     v-model="selectedExecutiveIndex" 
                     @change="onExecutiveSelect"
-                    required
-                    class="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl text-sm font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-udd-cyan transition-all">
+                    :class="[
+                      errors.selectedExecutiveIndex ? 'border-red-500 bg-red-50 ring-2 ring-red-200 focus:ring-red-400' : 'border-slate-200 focus:ring-udd-cyan',
+                      'w-full px-4 py-3 bg-white border rounded-xl text-sm font-semibold text-slate-800 focus:outline-none focus:ring-2 transition-all'
+                    ]">
                     <option value="" disabled selected>-- Seleccione Contacto UDD --</option>
                     <option v-for="(ex, idx) in ejecutivosFiltrados" :key="idx" :value="idx">
                       {{ ex.nombre }} — ({{ ex.email }})
                     </option>
                   </select>
+                  <span v-if="errors.selectedExecutiveIndex" class="text-xs text-red-600 font-semibold mt-1 block">
+                    <i class="fa-solid fa-circle-exclamation mr-1"></i> Debe seleccionar un Contacto UDD.
+                  </span>
                 </div>
               </div>
 
@@ -530,7 +584,8 @@
                 </button>
 
                 <button 
-                  type="submit" 
+                  type="button" 
+                  @click="submitForm"
                   :disabled="isSubmitting"
                   class="bg-udd-cyan hover:bg-udd-blue text-white font-extrabold px-8 py-3 rounded-xl transition-all flex items-center shadow-lg hover:shadow-xl transform active:scale-95 disabled:opacity-50">
                   <span v-if="!isSubmitting"><i class="fa-solid fa-paper-plane mr-2"></i> Finalizar Inscripción</span>
@@ -563,7 +618,7 @@
 
   <!-- LÓGICA VUE 3 -->
   <script>
-    const { createApp, ref, computed, onMounted } = Vue;
+    const { createApp, ref, computed, reactive, onMounted } = Vue;
 
     createApp({
       setup() {
@@ -573,7 +628,7 @@
         const isSubmitting = ref(false);
         const submitted = ref(false);
 
-        // Lista base por defecto (respaldo si falla la red)
+        // Lista base por defecto
         const ejecutivosLista = ref([
           { nombre: 'Valentina Rojas', email: 'vrojas@udd.cl', celular: '+56 9 8765 4321', sede: 'Santiago' },
           { nombre: 'Gonzalo Morales', email: 'gmorales@udd.cl', celular: '+56 9 7112 3344', sede: 'Santiago' },
@@ -583,7 +638,7 @@
 
         const selectedExecutiveIndex = ref('');
 
-        // Estructura principal del Formulario (Cursos desmarcados y campos de alumnos vacíos por defecto)
+        // Objeto de Formulario
         const form = ref({
           sede: 'Santiago',
           rbd: '',
@@ -602,11 +657,30 @@
           ejecutivoUDD: null
         });
 
+        // Estado Reactivo de Errores Visuales
+        const errors = reactive({
+          rbd: false,
+          nombreColegio: false,
+          comuna: false,
+          nombreContacto: false,
+          cargoContacto: false,
+          emailContacto: false,
+          celularContacto: false,
+          selectedExecutiveIndex: false
+        });
+
+        const courseErrors = reactive({
+          'II° Medio': { fecha: false, alumnos: false },
+          'III° Medio': { fecha: false, alumnos: false },
+          'IV° Medio': { fecha: false, alumnos: false },
+          'Egresados': { fecha: false, alumnos: false }
+        });
+
+        const step2GlobalError = ref('');
         const rbdError = ref('');
         const isRBDValid = ref(false);
         const currentVoucher = ref({});
 
-        // Carga dinámica de ejecutivos desde la pestaña de Google Sheets
         async function cargarEjecutivosPlanilla() {
           try {
             const res = await fetch(googleScriptUrl);
@@ -623,7 +697,22 @@
           return ejecutivosLista.value.filter(ex => !ex.sede || ex.sede === form.value.sede);
         });
 
-        // Algoritmo Módulo 11 (RBD)
+        function clearError(field) {
+          errors[field] = false;
+        }
+
+        function clearCourseError(cName, type) {
+          if (courseErrors[cName]) {
+            courseErrors[cName][type] = false;
+          }
+          step2GlobalError.value = '';
+        }
+
+        function onCourseDateInput(cName) {
+          clearCourseError(cName, 'fecha');
+          onDateInput(cName);
+        }
+
         function checkRBDValidity(rbdStr) {
           if (!rbdStr || !rbdStr.includes('-')) return false;
           const parts = rbdStr.trim().split('-');
@@ -650,8 +739,8 @@
           return dv === expectedDv;
         }
 
-        // Opción 3 Híbrida: Limpia el error visual inmediatamente al escribir (@input)
         function onRBDInput() {
+          errors.rbd = false;
           rbdError.value = '';
           if (!form.value.rbd) {
             isRBDValid.value = false;
@@ -660,7 +749,6 @@
           isRBDValid.value = checkRBDValidity(form.value.rbd);
         }
 
-        // Validación estricta Módulo 11 al salir del campo (@blur)
         function validateRBDOnBlur() {
           if (!form.value.rbd) {
             rbdError.value = '';
@@ -689,12 +777,19 @@
             selectedCoursesKeys.forEach(k => {
               if (k !== changedCourseName) {
                 form.value.cursos[k].fecha = primaryDate;
+                if (courseErrors[k]) courseErrors[k].fecha = false;
               }
             });
           }
         }
 
         function onCourseToggle(courseName) {
+          if (courseErrors[courseName]) {
+            courseErrors[courseName].fecha = false;
+            courseErrors[courseName].alumnos = false;
+          }
+          step2GlobalError.value = '';
+
           const selectedCoursesKeys = Object.keys(form.value.cursos).filter(k => form.value.cursos[k].selected);
           if (selectedCoursesKeys.length > 0 && form.value.cursos[courseName].selected) {
             const firstDate = form.value.cursos[selectedCoursesKeys[0]].fecha;
@@ -705,35 +800,11 @@
         }
 
         function onExecutiveSelect() {
-          if (selectedExecutiveIndex.value !== '' && ejecutivosFiltrados.value[selectedExecutiveIndex.value]) {
+          errors.selectedExecutiveIndex = false;
+          if (selectedExecutiveIndex.value !== '' && ejecutivosFiltrados.value[selectedExecutiveIndex.value] !== undefined) {
             form.value.ejecutivoUDD = { ...ejecutivosFiltrados.value[selectedExecutiveIndex.value] };
           }
         }
-
-        const isStep1Valid = computed(() => {
-          return form.value.sede && form.value.rbd && isRBDValid.value && form.value.nombreColegio && form.value.comuna.trim().length > 0;
-        });
-
-        const hasSelectedCourses = computed(() => {
-          return Object.values(form.value.cursos).some(c => c.selected);
-        });
-
-        const isStep2Valid = computed(() => {
-          if (!hasSelectedCourses.value) return false;
-          return Object.values(form.value.cursos).every(c => {
-            if (!c.selected) return true;
-            return c.fecha && c.alumnos && Number(c.alumnos) > 0;
-          });
-        });
-
-        const isStep3Valid = computed(() => {
-          return form.value.nombreContacto && 
-                 form.value.cargoContacto && 
-                 form.value.emailContacto && 
-                 form.value.celularContacto && 
-                 selectedExecutiveIndex.value !== '' && 
-                 selectedExecutiveIndex.value !== null;
-        });
 
         const stepProgressWidth = computed(() => {
           if (step.value === 1) return '33%';
@@ -741,15 +812,101 @@
           return '100%';
         });
 
+        function validateStep1() {
+          let valid = true;
+
+          if (!form.value.rbd || !form.value.rbd.trim()) {
+            errors.rbd = true;
+            valid = false;
+          } else if (!isRBDValid.value) {
+            validateRBDOnBlur();
+            valid = false;
+          }
+
+          if (!form.value.nombreColegio || !form.value.nombreColegio.trim()) {
+            errors.nombreColegio = true;
+            valid = false;
+          }
+
+          if (!form.value.comuna || !form.value.comuna.trim()) {
+            errors.comuna = true;
+            valid = false;
+          }
+
+          return valid;
+        }
+
+        function validateStep2() {
+          step2GlobalError.value = '';
+          let valid = true;
+          const selectedCourses = Object.keys(form.value.cursos).filter(k => form.value.cursos[k].selected);
+
+          if (selectedCourses.length === 0) {
+            step2GlobalError.value = 'Debe seleccionar al menos un curso para continuar.';
+            return false;
+          }
+
+          let missingDatesOrStudents = false;
+          selectedCourses.forEach(k => {
+            const c = form.value.cursos[k];
+            if (!c.fecha) {
+              courseErrors[k].fecha = true;
+              missingDatesOrStudents = true;
+              valid = false;
+            }
+            if (!c.alumnos || Number(c.alumnos) <= 0) {
+              courseErrors[k].alumnos = true;
+              missingDatesOrStudents = true;
+              valid = false;
+            }
+          });
+
+          if (missingDatesOrStudents) {
+            step2GlobalError.value = 'Por favor complete la fecha de aplicación y la cantidad aproximada de estudiantes en los cursos destacados en rojo.';
+          }
+
+          return valid;
+        }
+
+        function validateStep3() {
+          let valid = true;
+
+          if (!form.value.nombreContacto || !form.value.nombreContacto.trim()) {
+            errors.nombreContacto = true;
+            valid = false;
+          }
+          if (!form.value.cargoContacto || !form.value.cargoContacto.trim()) {
+            errors.cargoContacto = true;
+            valid = false;
+          }
+          if (!form.value.emailContacto || !form.value.emailContacto.trim() || !form.value.emailContacto.includes('@')) {
+            errors.emailContacto = true;
+            valid = false;
+          }
+          if (!form.value.celularContacto || !form.value.celularContacto.trim()) {
+            errors.celularContacto = true;
+            valid = false;
+          }
+          if (selectedExecutiveIndex.value === '' || selectedExecutiveIndex.value === null || selectedExecutiveIndex.value === undefined) {
+            errors.selectedExecutiveIndex = true;
+            valid = false;
+          }
+
+          return valid;
+        }
+
         function goToStep(s) {
-          if (s === 2 && !isStep1Valid.value) return;
-          if (s === 3 && (!isStep1Valid.value || !isStep2Valid.value)) return;
+          if (s === 2 && !validateStep1()) return;
+          if (s === 3) {
+            if (!validateStep1()) return;
+            if (!validateStep2()) return;
+          }
           step.value = s;
         }
 
         function focusFirstError() {
           Vue.nextTick(() => {
-            const errField = document.querySelector('.border-red-400, .border-red-500, :invalid');
+            const errField = document.querySelector('.border-red-500, .border-red-400');
             if (errField) {
               errField.scrollIntoView({ behavior: 'smooth', block: 'center' });
               if (typeof errField.focus === 'function') errField.focus();
@@ -759,16 +916,17 @@
 
         function nextStep(current) {
           if (current === 1) {
-            if (isStep1Valid.value) {
+            if (validateStep1()) {
               step.value = 2;
+              window.scrollTo({ top: 0, behavior: 'smooth' });
             } else {
-              validateRBDOnBlur();
               focusFirstError();
             }
           }
           if (current === 2) {
-            if (isStep2Valid.value) {
+            if (validateStep2()) {
               step.value = 3;
+              window.scrollTo({ top: 0, behavior: 'smooth' });
             } else {
               focusFirstError();
             }
@@ -776,10 +934,11 @@
         }
 
         async function submitForm() {
-          if (!isStep3Valid.value) {
+          if (!validateStep3()) {
             focusFirstError();
             return;
           }
+
           isSubmitting.value = true;
 
           const existing = JSON.parse(localStorage.getItem('udd_vocacional_registros') || '[]');
@@ -815,7 +974,6 @@
 
           const currentExec = ejecutivosFiltrados.value[selectedExecutiveIndex.value] || {};
 
-          // Objeto Comprobante
           const newRecord = {
             codigoTracking: trackingCode,
             sede: form.value.sede,
@@ -879,7 +1037,6 @@
           currentVoucher.value = newRecord;
           isSubmitting.value = false;
 
-          // Transición a la vista de confirmación integrada (inline)
           submitted.value = true;
           window.scrollTo({ top: 0, behavior: 'smooth' });
         }
@@ -902,7 +1059,15 @@
             celularContacto: '',
             ejecutivoUDD: null
           };
+
+          Object.keys(errors).forEach(k => errors[k] = false);
+          Object.keys(courseErrors).forEach(k => {
+            courseErrors[k].fecha = false;
+            courseErrors[k].alumnos = false;
+          });
+
           selectedExecutiveIndex.value = '';
+          step2GlobalError.value = '';
           rbdError.value = '';
           isRBDValid.value = false;
           step.value = 1;
@@ -931,20 +1096,20 @@
           step,
           submitted,
           form,
+          errors,
+          courseErrors,
+          step2GlobalError,
           rbdError,
           isRBDValid,
+          clearError,
+          clearCourseError,
+          onCourseDateInput,
           onRBDInput,
           validateRBDOnBlur,
-          focusFirstError,
-          onDateInput,
           onCourseToggle,
           ejecutivosFiltrados,
           selectedExecutiveIndex,
           onExecutiveSelect,
-          isStep1Valid,
-          hasSelectedCourses,
-          isStep2Valid,
-          isStep3Valid,
           stepProgressWidth,
           goToStep,
           nextStep,
