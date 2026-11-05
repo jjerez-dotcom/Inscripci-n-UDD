@@ -943,13 +943,6 @@
           let totalAlumnos = 0;
           let resumenTextos = [];
 
-          let detalleCursosSeparados = {
-            'II° Medio': '-',
-            'III° Medio': '-',
-            'IV° Medio': '-',
-            'Egresados': '-'
-          };
-
           Object.keys(form.value.cursos).forEach(k => {
             if (form.value.cursos[k].selected) {
               const c = form.value.cursos[k];
@@ -960,7 +953,6 @@
               });
               totalAlumnos += Number(c.alumnos);
               resumenTextos.push(`${k} (${c.fecha} - ${c.alumnos} est.)`);
-              detalleCursosSeparados[k] = `${c.fecha} (${c.alumnos} est.)`;
             }
           });
 
@@ -983,6 +975,10 @@
             fechaInscripcion: new Date().toISOString()
           };
 
+          // MAPEO EXACTO DE 26 COLUMNAS PARA EL BACKEND (Fechas y Cantidades Numéricas por separado)
+          const getCourseFecha = (cName) => (form.value.cursos[cName] && form.value.cursos[cName].selected && form.value.cursos[cName].fecha) ? form.value.cursos[cName].fecha : '-';
+          const getCourseCant = (cName) => (form.value.cursos[cName] && form.value.cursos[cName].selected && form.value.cursos[cName].alumnos) ? Number(form.value.cursos[cName].alumnos) : 0;
+
           const payloadGoogle = {
             codigoRegistro: trackingCode,
             fechaRegistro: new Date().toISOString(),
@@ -990,10 +986,14 @@
             rbd: form.value.rbd,
             nombreColegio: form.value.nombreColegio,
             comuna: form.value.comuna,
-            curso_II_Medio: detalleCursosSeparados['II° Medio'],
-            curso_III_Medio: detalleCursosSeparados['III° Medio'],
-            curso_IV_Medio: detalleCursosSeparados['IV° Medio'],
-            curso_Egresados: detalleCursosSeparados['Egresados'],
+            fecha_II_Medio: getCourseFecha('II° Medio'),
+            cant_II_Medio: getCourseCant('II° Medio'),
+            fecha_III_Medio: getCourseFecha('III° Medio'),
+            cant_III_Medio: getCourseCant('III° Medio'),
+            fecha_IV_Medio: getCourseFecha('IV° Medio'),
+            cant_IV_Medio: getCourseCant('IV° Medio'),
+            fecha_Egresados: getCourseFecha('Egresados'),
+            cant_Egresados: getCourseCant('Egresados'),
             totalAlumnos: totalAlumnos,
             contactoNombre: form.value.nombreContacto,
             contactoCargo: form.value.cargoContacto,
