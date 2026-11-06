@@ -39,7 +39,6 @@
   <style>
     [v-cloak] { display: none; }
     
-    /* Quitar flechas de ajuste en inputs numéricos */
     input[type=number]::-webkit-inner-spin-button, 
     input[type=number]::-webkit-outer-spin-button { 
       -webkit-appearance: none; 
@@ -50,21 +49,10 @@
     }
 
     @media print {
-      body * {
-        visibility: hidden;
-      }
-      #printable-voucher, #printable-voucher * {
-        visibility: visible;
-      }
-      #printable-voucher {
-        position: absolute;
-        left: 0;
-        top: 0;
-        width: 100%;
-      }
-      .no-print {
-        display: none !important;
-      }
+      body * { visibility: hidden; }
+      #printable-voucher, #printable-voucher * { visibility: visible; }
+      #printable-voucher { position: absolute; left: 0; top: 0; width: 100%; }
+      .no-print { display: none !important; }
     }
   </style>
 </head>
@@ -72,7 +60,7 @@
 
   <div id="app" v-cloak class="flex-grow flex flex-col">
     
-    <!-- CABECERA PRINCIPAL CON LOGOS OFICIALES -->
+    <!-- CABECERA PRINCIPAL CON LOGOS OFICIALES Y AÑO DINÁMICO -->
     <header class="bg-white text-slate-900 shadow-md border-b-4 border-udd-cyan sticky top-0 z-30 no-print">
       <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex items-center justify-between py-4 h-20 sm:h-24">
@@ -87,9 +75,9 @@
             />
           </div>
 
-          <!-- TÍTULO CENTRAL INSTITUCIONAL -->
+          <!-- TÍTULO CENTRAL INSTITUCIONAL (AÑO DINÁMICO) -->
           <div class="text-center hidden sm:block px-4">
-            <h1 class="text-base sm:text-xl font-extrabold text-udd-navy tracking-tight">Test de Orientación Vocacional UDD 2026</h1>
+            <h1 class="text-base sm:text-xl font-extrabold text-udd-navy tracking-tight">Test de Orientación Vocacional UDD {{ currentYear }}</h1>
           </div>
 
           <!-- LOGO FUNDACIÓN PROMUEVA -->
@@ -127,7 +115,7 @@
           </div>
         </div>
 
-        <!-- Mensaje de confirmación personalizado -->
+        <!-- Mensaje de confirmación -->
         <div class="bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-2xl p-4 flex items-start space-x-3">
           <i class="fa-solid fa-circle-check text-emerald-600 text-xl mt-0.5"></i>
           <div class="text-xs font-medium leading-relaxed">
@@ -476,7 +464,7 @@
                     type="text" 
                     v-model="form.nombreContacto" 
                     @input="clearError('nombreContacto')"
-                    placeholder="Ej: María José Fernández" 
+                    placeholder="Ej: MARÍA JOSÉ FERNÁNDEZ" 
                     :class="[
                       errors.nombreContacto ? 'border-red-500 bg-red-50 ring-2 ring-red-200 focus:ring-red-400' : 'border-slate-200 focus:ring-udd-cyan',
                       'w-full px-4 py-3 bg-slate-50 border rounded-xl text-sm focus:bg-white focus:outline-none focus:ring-2 transition-all'
@@ -495,7 +483,7 @@
                     type="text" 
                     v-model="form.cargoContacto" 
                     @input="clearError('cargoContacto')"
-                    placeholder="Ej: Orientadora / Directora" 
+                    placeholder="Ej: ORIENTADORA / DIRECTORA" 
                     :class="[
                       errors.cargoContacto ? 'border-red-500 bg-red-50 ring-2 ring-red-200 focus:ring-red-400' : 'border-slate-200 focus:ring-udd-cyan',
                       'w-full px-4 py-3 bg-slate-50 border rounded-xl text-sm focus:bg-white focus:outline-none focus:ring-2 transition-all'
@@ -505,7 +493,7 @@
                   </span>
                 </div>
 
-                <!-- EMAIL CONTACTO -->
+                <!-- EMAIL CONTACTO (VALIDACIÓN INMEDIATA AL BLUR) -->
                 <div>
                   <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">
                     Email de Contacto <span class="text-red-500">*</span>
@@ -514,33 +502,42 @@
                     type="email" 
                     v-model="form.emailContacto" 
                     @input="clearError('emailContacto')"
+                    @blur="validateEmailOnBlur"
                     placeholder="correo@colegio.cl" 
                     :class="[
                       errors.emailContacto ? 'border-red-500 bg-red-50 ring-2 ring-red-200 focus:ring-red-400' : 'border-slate-200 focus:ring-udd-cyan',
                       'w-full px-4 py-3 bg-slate-50 border rounded-xl text-sm focus:bg-white focus:outline-none focus:ring-2 transition-all'
                     ]">
                   <span v-if="errors.emailContacto" class="text-xs text-red-600 font-semibold mt-1 block">
-                    <i class="fa-solid fa-circle-exclamation mr-1"></i> Por favor ingrese un correo válido.
+                    <i class="fa-solid fa-circle-exclamation mr-1"></i> Por favor ingrese un correo válido (ej: nombre@dominio.cl).
                   </span>
                 </div>
 
-                <!-- CELULAR CONTACTO -->
+                <!-- CELULAR CONTACTO (+56 9 INAMOVIBLE + 8 DÍGITOS) -->
                 <div>
                   <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">
                     Celular de Contacto <span class="text-red-500">*</span>
                   </label>
-                  <input 
-                    type="tel" 
-                    v-model="form.celularContacto" 
-                    @input="clearError('celularContacto')"
-                    placeholder="+56 9 1234 5678" 
-                    :class="[
-                      errors.celularContacto ? 'border-red-500 bg-red-50 ring-2 ring-red-200 focus:ring-red-400' : 'border-slate-200 focus:ring-udd-cyan',
-                      'w-full px-4 py-3 bg-slate-50 border rounded-xl text-sm focus:bg-white focus:outline-none focus:ring-2 transition-all'
-                    ]">
+                  <div class="flex items-center">
+                    <span class="bg-slate-200 text-slate-700 font-mono font-bold text-sm px-3 py-3 rounded-l-xl border border-r-0 border-slate-200 select-none">
+                      +56 9
+                    </span>
+                    <input 
+                      type="text" 
+                      v-model="celular8Digits" 
+                      @input="onCelularInput"
+                      @blur="validateCelularOnBlur"
+                      maxlength="8"
+                      placeholder="12345678" 
+                      :class="[
+                        errors.celularContacto ? 'border-red-500 bg-red-50 ring-2 ring-red-200 focus:ring-red-400' : 'border-slate-200 focus:ring-udd-cyan',
+                        'w-full px-4 py-3 bg-slate-50 border rounded-r-xl text-sm focus:bg-white focus:outline-none focus:ring-2 font-mono font-bold transition-all'
+                      ]">
+                  </div>
                   <span v-if="errors.celularContacto" class="text-xs text-red-600 font-semibold mt-1 block">
-                    <i class="fa-solid fa-circle-exclamation mr-1"></i> Por favor ingrese el teléfono de contacto.
+                    <i class="fa-solid fa-circle-exclamation mr-1"></i> Ingrese los 8 dígitos restantes del celular.
                   </span>
+                  <span v-else class="text-[11px] text-slate-400 mt-1 block">Ejemplo: 912345678 (8 dígitos)</span>
                 </div>
               </div>
 
@@ -617,15 +614,18 @@
 
     createApp({
       setup() {
-        const googleScriptUrl = 'https://script.google.com/macros/s/AKfycbw6KXgbUs40doXZmGWnWL5SFx1KIPjk0YcjAreX1mrdvQArqjvlf-kjEIt31ZLdVkbAJA/exec';
+        const googleScriptUrl = 'https://script.google.com/macros/s/AKfycbxBLcG5GWNT7B4q6ataIf0zOqHQ0RpHZBN1my8TEtkJIlYdD_j1Z5f9mUTBZy9zhZHzGg/exec';
+
+        const currentYear = computed(() => new Date().getFullYear());
 
         const step = ref(1);
         const isSubmitting = ref(false);
         const submitted = ref(false);
 
-        // Sin datos hardcodeados: se cargan 100% dinámicos desde Google Sheets
         const ejecutivosLista = ref([]);
         const selectedExecutiveIndex = ref('');
+
+        const celular8Digits = ref('');
 
         const form = ref({
           sede: 'Santiago',
@@ -668,7 +668,6 @@
         const isRBDValid = ref(false);
         const currentVoucher = ref({});
 
-        // Petición corregida enviando ?action=getEjecutivos al backend
         async function cargarEjecutivosPlanilla() {
           try {
             const res = await fetch(`${googleScriptUrl}?action=getEjecutivos`);
@@ -679,7 +678,7 @@
               console.warn("No se obtuvieron ejecutivos de la planilla.");
             }
           } catch (e) {
-            console.error("Error cargando lista de ejecutivos desde Google Apps Script:", e);
+            console.error("Error cargando lista de ejecutivos:", e);
           }
         }
 
@@ -689,6 +688,28 @@
 
         function clearError(field) {
           errors[field] = false;
+        }
+
+        function validateEmailOnBlur() {
+          if (!form.value.emailContacto || !form.value.emailContacto.trim()) {
+            errors.emailContacto = true;
+            return;
+          }
+          const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+          errors.emailContacto = !emailRegex.test(form.value.emailContacto.trim());
+        }
+
+        function onCelularInput() {
+          celular8Digits.value = celular8Digits.value.replace(/\D/g, '').slice(0, 8);
+          errors.celularContacto = false;
+        }
+
+        function validateCelularOnBlur() {
+          if (celular8Digits.value.length !== 8) {
+            errors.celularContacto = true;
+          } else {
+            errors.celularContacto = false;
+          }
         }
 
         function clearCourseError(cName, type) {
@@ -804,7 +825,6 @@
 
         function validateStep1() {
           let valid = true;
-
           if (!form.value.rbd || !form.value.rbd.trim()) {
             errors.rbd = true;
             valid = false;
@@ -812,17 +832,14 @@
             validateRBDOnBlur();
             valid = false;
           }
-
           if (!form.value.nombreColegio || !form.value.nombreColegio.trim()) {
             errors.nombreColegio = true;
             valid = false;
           }
-
           if (!form.value.comuna || !form.value.comuna.trim()) {
             errors.comuna = true;
             valid = false;
           }
-
           return valid;
         }
 
@@ -860,7 +877,6 @@
 
         function validateStep3() {
           let valid = true;
-
           if (!form.value.nombreContacto || !form.value.nombreContacto.trim()) {
             errors.nombreContacto = true;
             valid = false;
@@ -869,19 +885,16 @@
             errors.cargoContacto = true;
             valid = false;
           }
-          if (!form.value.emailContacto || !form.value.emailContacto.trim() || !form.value.emailContacto.includes('@')) {
-            errors.emailContacto = true;
-            valid = false;
-          }
-          if (!form.value.celularContacto || !form.value.celularContacto.trim()) {
-            errors.celularContacto = true;
-            valid = false;
-          }
+          validateEmailOnBlur();
+          if (errors.emailContacto) valid = false;
+
+          validateCelularOnBlur();
+          if (errors.celularContacto) valid = false;
+
           if (selectedExecutiveIndex.value === '' || selectedExecutiveIndex.value === null || selectedExecutiveIndex.value === undefined) {
             errors.selectedExecutiveIndex = true;
             valid = false;
           }
-
           return valid;
         }
 
@@ -931,6 +944,11 @@
 
           isSubmitting.value = true;
 
+          // Formateo del celular a +56 9 XXXX XXXX
+          const rawDigits = celular8Digits.value.replace(/\D/g, '');
+          const formattedPhone = `+56 9 ${rawDigits.slice(0, 4)} ${rawDigits.slice(4)}`;
+          form.value.celularContacto = formattedPhone;
+
           const existing = JSON.parse(localStorage.getItem('udd_vocacional_registros') || '[]');
           const year = new Date().getFullYear();
           const sedeSigla = form.value.sede === 'Santiago' ? 'SCL' : 'CCP';
@@ -954,15 +972,14 @@
 
           const currentExec = ejecutivosFiltrados.value[selectedExecutiveIndex.value] || {};
 
-          // Datos empaquetados en los nombres exactos esperados por el esquema de 26 columnas (A-Z)
+          // MAYÚSCULAS en el envio a Google (excepto email y celular que ya está formateado)
           const payloadGoogle = {
             codigoRegistro: trackingCode,
             sede: form.value.sede,
-            rbd: form.value.rbd,
-            nombreColegio: form.value.nombreColegio,
-            comuna: form.value.comuna,
+            rbd: form.value.rbd.trim(),
+            nombreColegio: form.value.nombreColegio.trim().toUpperCase(),
+            comuna: form.value.comuna.trim().toUpperCase(),
             
-            // Cursos separados por fecha y cantidad para permitir sumas en Google Sheets
             fecha_II_Medio: form.value.cursos['II° Medio'].selected ? form.value.cursos['II° Medio'].fecha : '',
             cant_II_Medio: form.value.cursos['II° Medio'].selected ? Number(form.value.cursos['II° Medio'].alumnos) || 0 : 0,
             
@@ -976,10 +993,10 @@
             cant_Egresados: form.value.cursos['Egresados'].selected ? Number(form.value.cursos['Egresados'].alumnos) || 0 : 0,
             
             totalAlumnos: totalAlumnos,
-            contactoNombre: form.value.nombreContacto,
-            contactoCargo: form.value.cargoContacto,
-            contactoEmail: form.value.emailContacto,
-            contactoCelular: form.value.celularContacto,
+            contactoNombre: form.value.nombreContacto.trim().toUpperCase(),
+            contactoCargo: form.value.cargoContacto.trim().toUpperCase(),
+            contactoEmail: form.value.emailContacto.trim(),
+            contactoCelular: formattedPhone,
             ejecutivo: currentExec.nombre || '',
             ejecutivoEmail: currentExec.email || '',
             ejecutivoCelular: currentExec.celular || ''
@@ -989,14 +1006,14 @@
             codigoTracking: trackingCode,
             sede: form.value.sede,
             rbd: form.value.rbd,
-            nombreColegio: form.value.nombreColegio,
-            comuna: form.value.comuna,
+            nombreColegio: form.value.nombreColegio.trim().toUpperCase(),
+            comuna: form.value.comuna.trim().toUpperCase(),
             cursosResumen,
             totalAlumnos,
-            nombreContacto: form.value.nombreContacto,
-            cargoContacto: form.value.cargoContacto,
-            emailContacto: form.value.emailContacto,
-            celularContacto: form.value.celularContacto,
+            nombreContacto: form.value.nombreContacto.trim().toUpperCase(),
+            cargoContacto: form.value.cargoContacto.trim().toUpperCase(),
+            emailContacto: form.value.emailContacto.trim(),
+            celularContacto: formattedPhone,
             ejecutivoUDD: currentExec,
             fechaInscripcion: new Date().toISOString()
           };
@@ -1009,8 +1026,8 @@
               body: JSON.stringify(payloadGoogle)
             });
             const resData = await response.json();
-            if (resData && resData.status === 'success' && resData.code) {
-              serverCode = resData.code;
+            if (resData && resData.status === 'success' && resData.codigoRegistro) {
+              serverCode = resData.codigoRegistro;
             }
           } catch (e) {
             console.warn("Error recibiendo respuesta de Google Sheets:", e);
@@ -1050,6 +1067,7 @@
             ejecutivoUDD: null
           };
 
+          celular8Digits.value = '';
           Object.keys(errors).forEach(k => errors[k] = false);
           Object.keys(courseErrors).forEach(k => {
             courseErrors[k].fecha = false;
@@ -1083,9 +1101,14 @@
         });
 
         return {
+          currentYear,
           step,
           submitted,
           form,
+          celular8Digits,
+          onCelularInput,
+          validateCelularOnBlur,
+          validateEmailOnBlur,
           errors,
           courseErrors,
           step2GlobalError,
