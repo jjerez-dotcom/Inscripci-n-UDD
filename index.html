@@ -115,12 +115,12 @@
           </div>
         </div>
 
-        <!-- Mensaje de confirmación -->
+        <!-- Mensaje de confirmación (TEXTO CAMBIOS V3) -->
         <div class="bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-2xl p-4 flex items-start space-x-3">
           <i class="fa-solid fa-circle-check text-emerald-600 text-xl mt-0.5"></i>
           <div class="text-xs font-medium leading-relaxed">
             <p class="font-bold text-sm text-emerald-900 mb-1">¡Inscripción recibida con éxito!</p>
-            <p>Estimado(a) <strong>{{ currentVoucher.nombreContacto }}</strong>, confirmamos la recepción de la inscripción de su establecimiento. Pronto nos pondremos en contacto para coordinar los detalles.</p>
+            <p>Estimado(a) <strong>{{ currentVoucher.nombreContacto }}</strong>, confirmamos la inscripción de su establecimiento. Su solicitud se encuentra actualmente en estado Pendiente de Validación. Pronto nos pondremos en contacto para coordinar los detalles.</p>
           </div>
         </div>
 
@@ -352,6 +352,7 @@
                 <p class="text-xs text-slate-500 mt-1">Seleccione los niveles a evaluar. La fecha del primer curso seleccionado se copiará a los demás.</p>
               </div>
 
+              <!-- ALERTA SOLO APARECE SI SE APRIETA SIGUIENTE SIN ELEGIR CURSO -->
               <div v-if="step2GlobalError" class="p-4 bg-red-50 border border-red-300 rounded-xl text-red-800 text-xs flex items-start space-x-2">
                 <i class="fa-solid fa-triangle-exclamation text-red-600 text-base mt-0.5"></i>
                 <div>
@@ -398,17 +399,18 @@
                           ]">
                       </div>
 
+                      <!-- CAMPO ESTUDIANTES APROX (TEXTO CORREGIDO Y HASTA 3 DÍGITOS) -->
                       <div>
                         <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-600 mb-1">
-                          Estudiantes approx. <span class="text-red-500">*</span>
+                          Estudiantes aprox. <span class="text-red-500">*</span>
                         </label>
                         <input 
                           type="number" 
                           v-model="cData.alumnos" 
-                          @input="clearCourseError(cName, 'alumnos')"
+                          @input="onAlumnosInput($event, cName)"
                           min="1" 
-                          max="1000"
-                          placeholder="Cantidad"
+                          max="999"
+                          placeholder="Máx 999"
                           :class="[
                             courseErrors[cName]?.alumnos ? 'border-red-500 bg-red-50 ring-2 ring-red-200 focus:ring-red-400' : 'border-slate-200 focus:ring-udd-cyan',
                             'w-full max-w-[130px] px-3 py-2 bg-white border rounded-lg text-xs font-mono font-bold focus:outline-none focus:ring-2 transition-all'
@@ -513,31 +515,31 @@
                   </span>
                 </div>
 
-                <!-- CELULAR CONTACTO (+56 9 INAMOVIBLE + 8 DÍGITOS) -->
+                <!-- CELULAR CONTACTO (+56 9 INAMOVIBLE FIJO EN 1 LÍNEA + SEPARACIÓN AUTOMÁTICA xxxx xxxx) -->
                 <div>
                   <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">
                     Celular de Contacto <span class="text-red-500">*</span>
                   </label>
                   <div class="flex items-center">
-                    <span class="bg-slate-200 text-slate-700 font-mono font-bold text-sm px-3 py-3 rounded-l-xl border border-r-0 border-slate-200 select-none">
+                    <span class="flex-shrink-0 whitespace-nowrap bg-slate-200 text-slate-700 font-mono font-bold text-sm px-3 py-3 rounded-l-xl border border-r-0 border-slate-200 select-none">
                       +56 9
                     </span>
                     <input 
                       type="text" 
-                      v-model="celular8Digits" 
-                      @input="onCelularInput"
+                      v-model="celularFormattedDisplay" 
+                      @input="onCelularInputFormatted"
                       @blur="validateCelularOnBlur"
-                      maxlength="8"
-                      placeholder="12345678" 
+                      maxlength="9"
+                      placeholder="9876 5432" 
                       :class="[
                         errors.celularContacto ? 'border-red-500 bg-red-50 ring-2 ring-red-200 focus:ring-red-400' : 'border-slate-200 focus:ring-udd-cyan',
                         'w-full px-4 py-3 bg-slate-50 border rounded-r-xl text-sm focus:bg-white focus:outline-none focus:ring-2 font-mono font-bold transition-all'
                       ]">
                   </div>
                   <span v-if="errors.celularContacto" class="text-xs text-red-600 font-semibold mt-1 block">
-                    <i class="fa-solid fa-circle-exclamation mr-1"></i> Ingrese los 8 dígitos restantes del celular.
+                    <i class="fa-solid fa-circle-exclamation mr-1"></i> Ingrese los 8 dígitos del celular (ej. 9876 5432).
                   </span>
-                  <span v-else class="text-[11px] text-slate-400 mt-1 block">Ejemplo: 912345678 (8 dígitos)</span>
+                  <span v-else class="text-[11px] text-slate-400 mt-1 block">Formato: 8 dígitos (ej: 9876 5432)</span>
                 </div>
               </div>
 
@@ -626,6 +628,7 @@
         const selectedExecutiveIndex = ref('');
 
         const celular8Digits = ref('');
+        const celularFormattedDisplay = ref('');
 
         const form = ref({
           sede: 'Santiago',
@@ -699,8 +702,14 @@
           errors.emailContacto = !emailRegex.test(form.value.emailContacto.trim());
         }
 
-        function onCelularInput() {
-          celular8Digits.value = celular8Digits.value.replace(/\D/g, '').slice(0, 8);
+        function onCelularInputFormatted(e) {
+          let raw = e.target.value.replace(/\D/g, '').slice(0, 8);
+          celular8Digits.value = raw;
+          if (raw.length > 4) {
+            celularFormattedDisplay.value = raw.slice(0, 4) + ' ' + raw.slice(4);
+          } else {
+            celularFormattedDisplay.value = raw;
+          }
           errors.celularContacto = false;
         }
 
@@ -710,6 +719,13 @@
           } else {
             errors.celularContacto = false;
           }
+        }
+
+        function onAlumnosInput(e, cName) {
+          let val = e.target.value.replace(/\D/g, '');
+          if (val.length > 3) val = val.slice(0, 3);
+          form.value.cursos[cName].alumnos = val ? parseInt(val, 10) : null;
+          clearCourseError(cName, 'alumnos');
         }
 
         function clearCourseError(cName, type) {
@@ -921,6 +937,7 @@
           if (current === 1) {
             if (validateStep1()) {
               step.value = 2;
+              step2GlobalError.value = ''; // Se limpia la alerta al pasar al paso 2
               window.scrollTo({ top: 0, behavior: 'smooth' });
             } else {
               focusFirstError();
@@ -972,7 +989,7 @@
 
           const currentExec = ejecutivosFiltrados.value[selectedExecutiveIndex.value] || {};
 
-          // MAYÚSCULAS en el envio a Google (excepto email y celular que ya está formateado)
+          // MAYÚSCULAS al enviar a Google Sheets
           const payloadGoogle = {
             codigoRegistro: trackingCode,
             sede: form.value.sede,
@@ -1068,6 +1085,7 @@
           };
 
           celular8Digits.value = '';
+          celularFormattedDisplay.value = '';
           Object.keys(errors).forEach(k => errors[k] = false);
           Object.keys(courseErrors).forEach(k => {
             courseErrors[k].fecha = false;
@@ -1106,9 +1124,11 @@
           submitted,
           form,
           celular8Digits,
-          onCelularInput,
+          celularFormattedDisplay,
+          onCelularInputFormatted,
           validateCelularOnBlur,
           validateEmailOnBlur,
+          onAlumnosInput,
           errors,
           courseErrors,
           step2GlobalError,
