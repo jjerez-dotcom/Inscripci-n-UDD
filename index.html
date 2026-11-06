@@ -617,19 +617,14 @@
 
     createApp({
       setup() {
-        const googleScriptUrl = 'https://script.google.com/macros/s/AKfycbw6KXgbUs40doXZmGWnWL5SFx1KIPjk0YcjAreX1mrdvQArqjvlf-kjEIt31ZLdVkbAJA/exec';
+        const googleScriptUrl = 'https://script.google.com/macros/s/AKfycbxBLcG5GWNT7B4q6ataIf0zOqHQ0RpHZBN1my8TEtkJIlYdD_j1Z5f9mUTBZy9zhZHzGg/exec';
 
         const step = ref(1);
         const isSubmitting = ref(false);
         const submitted = ref(false);
 
-        const ejecutivosLista = ref([
-          { nombre: 'Valentina Rojas', email: 'vrojas@udd.cl', celular: '+56 9 8765 4321', sede: 'Santiago' },
-          { nombre: 'Gonzalo Morales', email: 'gmorales@udd.cl', celular: '+56 9 7112 3344', sede: 'Santiago' },
-          { nombre: 'Camila Silva', email: 'csilva@udd.cl', celular: '+56 9 5544 3322', sede: 'Concepción' },
-          { nombre: 'Matías Fuentes', email: 'mfuentes@udd.cl', celular: '+56 9 4433 2211', sede: 'Concepción' }
-        ]);
-
+        // Sin datos hardcodeados: se cargan 100% dinámicos desde Google Sheets
+        const ejecutivosLista = ref([]);
         const selectedExecutiveIndex = ref('');
 
         const form = ref({
@@ -673,15 +668,18 @@
         const isRBDValid = ref(false);
         const currentVoucher = ref({});
 
+        // Petición corregida enviando ?action=getEjecutivos al backend
         async function cargarEjecutivosPlanilla() {
           try {
-            const res = await fetch(googleScriptUrl);
+            const res = await fetch(`${googleScriptUrl}?action=getEjecutivos`);
             const json = await res.json();
             if (json.status === 'success' && json.ejecutivos && json.ejecutivos.length > 0) {
               ejecutivosLista.value = json.ejecutivos;
+            } else {
+              console.warn("No se obtuvieron ejecutivos de la planilla.");
             }
           } catch (e) {
-            console.warn("Usando lista local de ejecutivos por defecto.");
+            console.error("Error cargando lista de ejecutivos desde Google Apps Script:", e);
           }
         }
 
@@ -941,7 +939,6 @@
 
           const cursosResumen = [];
           let totalAlumnos = 0;
-          let resumenTextos = [];
 
           Object.keys(form.value.cursos).forEach(k => {
             if (form.value.cursos[k].selected) {
@@ -952,48 +949,32 @@
                 alumnos: Number(c.alumnos)
               });
               totalAlumnos += Number(c.alumnos);
-              resumenTextos.push(`${k} (${c.fecha} - ${c.alumnos} est.)`);
             }
           });
 
           const currentExec = ejecutivosFiltrados.value[selectedExecutiveIndex.value] || {};
 
-          const newRecord = {
-            codigoTracking: trackingCode,
-            sede: form.value.sede,
-            rbd: form.value.rbd,
-            nombreColegio: form.value.nombreColegio,
-            comuna: form.value.comuna,
-            cursosResumen,
-            cursosResumenTexto: resumenTextos.join(' | '),
-            totalAlumnos,
-            nombreContacto: form.value.nombreContacto,
-            cargoContacto: form.value.cargoContacto,
-            emailContacto: form.value.emailContacto,
-            celularContacto: form.value.celularContacto,
-            ejecutivoUDD: currentExec,
-            fechaInscripcion: new Date().toISOString()
-          };
-
-          // MAPEO EXACTO DE 26 COLUMNAS PARA EL BACKEND (Fechas y Cantidades Numéricas por separado)
-          const getCourseFecha = (cName) => (form.value.cursos[cName] && form.value.cursos[cName].selected && form.value.cursos[cName].fecha) ? form.value.cursos[cName].fecha : '-';
-          const getCourseCant = (cName) => (form.value.cursos[cName] && form.value.cursos[cName].selected && form.value.cursos[cName].alumnos) ? Number(form.value.cursos[cName].alumnos) : 0;
-
+          // Datos empaquetados en los nombres exactos esperados por el esquema de 26 columnas (A-Z)
           const payloadGoogle = {
             codigoRegistro: trackingCode,
-            fechaRegistro: new Date().toISOString(),
             sede: form.value.sede,
             rbd: form.value.rbd,
             nombreColegio: form.value.nombreColegio,
             comuna: form.value.comuna,
-            fecha_II_Medio: getCourseFecha('II° Medio'),
-            cant_II_Medio: getCourseCant('II° Medio'),
-            fecha_III_Medio: getCourseFecha('III° Medio'),
-            cant_III_Medio: getCourseCant('III° Medio'),
-            fecha_IV_Medio: getCourseFecha('IV° Medio'),
-            cant_IV_Medio: getCourseCant('IV° Medio'),
-            fecha_Egresados: getCourseFecha('Egresados'),
-            cant_Egresados: getCourseCant('Egresados'),
+            
+            // Cursos separados por fecha y cantidad para permitir sumas en Google Sheets
+            fecha_II_Medio: form.value.cursos['II° Medio'].selected ? form.value.cursos['II° Medio'].fecha : '',
+            cant_II_Medio: form.value.cursos['II° Medio'].selected ? Number(form.value.cursos['II° Medio'].alumnos) || 0 : 0,
+            
+            fecha_III_Medio: form.value.cursos['III° Medio'].selected ? form.value.cursos['III° Medio'].fecha : '',
+            cant_III_Medio: form.value.cursos['III° Medio'].selected ? Number(form.value.cursos['III° Medio'].alumnos) || 0 : 0,
+            
+            fecha_IV_Medio: form.value.cursos['IV° Medio'].selected ? form.value.cursos['IV° Medio'].fecha : '',
+            cant_IV_Medio: form.value.cursos['IV° Medio'].selected ? Number(form.value.cursos['IV° Medio'].alumnos) || 0 : 0,
+            
+            fecha_Egresados: form.value.cursos['Egresados'].selected ? form.value.cursos['Egresados'].fecha : '',
+            cant_Egresados: form.value.cursos['Egresados'].selected ? Number(form.value.cursos['Egresados'].alumnos) || 0 : 0,
+            
             totalAlumnos: totalAlumnos,
             contactoNombre: form.value.nombreContacto,
             contactoCargo: form.value.cargoContacto,
@@ -1004,6 +985,22 @@
             ejecutivoCelular: currentExec.celular || ''
           };
 
+          const newRecord = {
+            codigoTracking: trackingCode,
+            sede: form.value.sede,
+            rbd: form.value.rbd,
+            nombreColegio: form.value.nombreColegio,
+            comuna: form.value.comuna,
+            cursosResumen,
+            totalAlumnos,
+            nombreContacto: form.value.nombreContacto,
+            cargoContacto: form.value.cargoContacto,
+            emailContacto: form.value.emailContacto,
+            celularContacto: form.value.celularContacto,
+            ejecutivoUDD: currentExec,
+            fechaInscripcion: new Date().toISOString()
+          };
+
           let serverCode = '';
           try {
             const response = await fetch(googleScriptUrl, {
@@ -1012,11 +1009,11 @@
               body: JSON.stringify(payloadGoogle)
             });
             const resData = await response.json();
-            if (resData && resData.status === 'success' && resData.codigoRegistro) {
-              serverCode = resData.codigoRegistro;
+            if (resData && resData.status === 'success' && resData.code) {
+              serverCode = resData.code;
             }
           } catch (e) {
-            console.warn("Error recibiendo respuesta de Google Sheets, usando correlativo local:", e);
+            console.warn("Error recibiendo respuesta de Google Sheets:", e);
           }
 
           if (serverCode) {
