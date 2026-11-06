@@ -115,12 +115,12 @@
           </div>
         </div>
 
-        <!-- Mensaje de confirmación -->
+        <!-- Mensaje de confirmación actualizado -->
         <div class="bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-2xl p-4 flex items-start space-x-3">
           <i class="fa-solid fa-circle-check text-emerald-600 text-xl mt-0.5"></i>
           <div class="text-xs font-medium leading-relaxed">
             <p class="font-bold text-sm text-emerald-900 mb-1">¡Inscripción recibida con éxito!</p>
-            <p>Estimado(a) <strong>{{ currentVoucher.nombreContacto }}</strong>, confirmamos la recepción de su solicitud. Se encuentra en estado Pendiente de Validación y pronto nos pondremos en contacto.</p>
+            <p>Estimado(a) <strong>{{ currentVoucher.nombreContacto }}</strong>, confirmamos la recepción de su solicitud. Actualmente, se encuentra en estado Pendiente de Validación y pronto nos pondremos en contacto.</p>
           </div>
         </div>
 
@@ -614,6 +614,7 @@
 
     createApp({
       setup() {
+        // URL Oficial de la Web App en Google Apps Script
         const googleScriptUrl = 'https://script.google.com/macros/s/AKfycbw6KXgbUs40doXZmGWnWL5SFx1KIPjk0YcjAreX1mrdvQArqjvlf-kjEIt31ZLdVkbAJA/exec';
 
         const currentYear = computed(() => new Date().getFullYear());
@@ -970,7 +971,6 @@
           const cursosResumen = [];
           let totalAlumnos = 0;
 
-          // Se incluyen únicamente los cursos seleccionados con alumnos > 0
           Object.keys(form.value.cursos).forEach(k => {
             if (form.value.cursos[k].selected && Number(form.value.cursos[k].alumnos) > 0) {
               const c = form.value.cursos[k];
