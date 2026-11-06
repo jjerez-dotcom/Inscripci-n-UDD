@@ -75,7 +75,7 @@
             />
           </div>
 
-          <!-- TÍTULO CENTRAL INSTITUCIONAL (AÑO DINÁMICO) -->
+          <!-- TÍTULO CENTRAL INSTITUCIONAL -->
           <div class="text-center hidden sm:block px-4">
             <h1 class="text-base sm:text-xl font-extrabold text-udd-navy tracking-tight">Test de Orientación Vocacional UDD {{ currentYear }}</h1>
           </div>
@@ -120,7 +120,7 @@
           <i class="fa-solid fa-circle-check text-emerald-600 text-xl mt-0.5"></i>
           <div class="text-xs font-medium leading-relaxed">
             <p class="font-bold text-sm text-emerald-900 mb-1">¡Inscripción recibida con éxito!</p>
-            <p>Estimado(a) <strong>{{ currentVoucher.nombreContacto }}</strong>, confirmamos la inscripción de su establecimiento. Su solicitud se encuentra actualmente en estado Pendiente de Validación. Pronto nos pondremos en contacto para coordinar los detalles.</p>
+            <p>Estimado(a) <strong>{{ currentVoucher.nombreContacto }}</strong>, confirmamos la recepción de su solicitud. Se encuentra en estado Pendiente de Validación y pronto nos pondremos en contacto.</p>
           </div>
         </div>
 
@@ -151,7 +151,7 @@
               <span class="font-mono font-bold bg-white px-2 py-0.5 rounded border text-[11px]">{{ c.alumnos }} estudiantes</span>
             </div>
             <div class="pt-2 border-t border-slate-200 flex justify-between font-bold text-udd-navy">
-              <span>Total Estudiantes Evaluados:</span>
+              <span>Total Estudiantes Estimados:</span>
               <span class="font-mono">{{ currentVoucher.totalAlumnos }} estudiantes</span>
             </div>
           </div>
@@ -352,7 +352,6 @@
                 <p class="text-xs text-slate-500 mt-1">Seleccione los niveles a evaluar. La fecha del primer curso seleccionado se copiará a los demás.</p>
               </div>
 
-              <!-- ALERTA SOLO APARECE SI SE APRIETA SIGUIENTE SIN ELEGIR CURSO -->
               <div v-if="step2GlobalError" class="p-4 bg-red-50 border border-red-300 rounded-xl text-red-800 text-xs flex items-start space-x-2">
                 <i class="fa-solid fa-triangle-exclamation text-red-600 text-base mt-0.5"></i>
                 <div>
@@ -399,7 +398,6 @@
                           ]">
                       </div>
 
-                      <!-- CAMPO ESTUDIANTES APROX (TEXTO CORREGIDO Y HASTA 3 DÍGITOS) -->
                       <div>
                         <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-600 mb-1">
                           Estudiantes aprox. <span class="text-red-500">*</span>
@@ -495,7 +493,7 @@
                   </span>
                 </div>
 
-                <!-- EMAIL CONTACTO (VALIDACIÓN INMEDIATA AL BLUR) -->
+                <!-- EMAIL CONTACTO -->
                 <div>
                   <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">
                     Email de Contacto <span class="text-red-500">*</span>
@@ -515,7 +513,7 @@
                   </span>
                 </div>
 
-                <!-- CELULAR CONTACTO (+56 9 INAMOVIBLE FIJO EN 1 LÍNEA + SEPARACIÓN AUTOMÁTICA xxxx xxxx) -->
+                <!-- CELULAR CONTACTO (+56 9) -->
                 <div>
                   <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">
                     Celular de Contacto <span class="text-red-500">*</span>
@@ -616,7 +614,7 @@
 
     createApp({
       setup() {
-        const googleScriptUrl = 'https://script.google.com/macros/s/AKfycbw6KXgbUs40doXZmGWnWL5SFx1KIPjk0YcjAreX1mrdvQArqjvlf-kjEIt31ZLdVkbAJA/exec';
+        const googleScriptUrl = 'https://script.google.com/macros/s/AKfycbxBLcG5GWNT7B4q6ataIf0zOqHQ0RpHZBN1my8TEtkJIlYdD_j1Z5f9mUTBZy9zhZHzGg/exec';
 
         const currentYear = computed(() => new Date().getFullYear());
 
@@ -677,11 +675,9 @@
             const json = await res.json();
             if (json.status === 'success' && json.ejecutivos && json.ejecutivos.length > 0) {
               ejecutivosLista.value = json.ejecutivos;
-            } else {
-              console.warn("No se obtuvieron ejecutivos de la planilla.");
             }
           } catch (e) {
-            console.error("Error cargando lista de ejecutivos:", e);
+            console.warn("Error cargando lista de ejecutivos:", e);
           }
         }
 
@@ -937,7 +933,7 @@
           if (current === 1) {
             if (validateStep1()) {
               step.value = 2;
-              step2GlobalError.value = ''; // Se limpia la alerta al pasar al paso 2
+              step2GlobalError.value = '';
               window.scrollTo({ top: 0, behavior: 'smooth' });
             } else {
               focusFirstError();
@@ -961,7 +957,6 @@
 
           isSubmitting.value = true;
 
-          // Formateo del celular a +56 9 XXXX XXXX
           const rawDigits = celular8Digits.value.replace(/\D/g, '');
           const formattedPhone = `+56 9 ${rawDigits.slice(0, 4)} ${rawDigits.slice(4)}`;
           form.value.celularContacto = formattedPhone;
@@ -975,8 +970,9 @@
           const cursosResumen = [];
           let totalAlumnos = 0;
 
+          // Se incluyen únicamente los cursos seleccionados con alumnos > 0
           Object.keys(form.value.cursos).forEach(k => {
-            if (form.value.cursos[k].selected) {
+            if (form.value.cursos[k].selected && Number(form.value.cursos[k].alumnos) > 0) {
               const c = form.value.cursos[k];
               cursosResumen.push({
                 nombre: k,
@@ -989,7 +985,6 @@
 
           const currentExec = ejecutivosFiltrados.value[selectedExecutiveIndex.value] || {};
 
-          // MAYÚSCULAS al enviar a Google Sheets
           const payloadGoogle = {
             codigoRegistro: trackingCode,
             sede: form.value.sede,
